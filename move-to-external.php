@@ -56,8 +56,7 @@ if (optional_param('execute', false, PARAM_INT)) {
                  )
                AND filename    LIKE '__%'
                AND filesize    > 2
-               AND mimetype    IS NOT NULL
-             LIMIT 100000";
+               AND mimetype    IS NOT NULL";
     $files = $DB->get_records_sql($sql);
     /** @var object $file */
     foreach ($files as $file) {
@@ -75,9 +74,11 @@ if (optional_param('execute', false, PARAM_INT)) {
     }
 } else {
 
+    $decsep = get_string('decsep', 'langconfig');
+    $thousandssep = get_string('thousandssep', 'langconfig');
     $a = [
-        'missing' => $externalfilesystem->missing_count(),
-        'sending' => $externalfilesystem->sending_count(),
+        'missing' => number_format($externalfilesystem->missing_count(), 0, $decsep, $thousandssep),
+        'sending' => number_format($externalfilesystem->sending_count(), 0, $decsep, $thousandssep),
     ];
     echo get_string('migrate_total', 'local_alternative_file_system', $a);
     echo get_string('migrate_link', 'local_alternative_file_system');
