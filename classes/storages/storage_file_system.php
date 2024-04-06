@@ -205,7 +205,7 @@ class storage_file_system extends file_system {
      * @param string $contenthash
      * @param string $storage
      *
-     * @throws dml_exception
+     * @return bool
      */
     public function report_save($contenthash, $storage) {
         global $DB;
@@ -215,7 +215,12 @@ class storage_file_system extends file_system {
             "storage" => $storage,
             "timemodifield" => time(),
         ];
-        $DB->insert_record("alternative_file_system_file", $data);
+        try {
+            $DB->insert_record("alternative_file_system_file", $data);
+            return true;
+        } catch (dml_exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -260,6 +265,49 @@ class storage_file_system extends file_system {
     }
 
     /**
+     * Add file content to sha1 pool.
+     *
+     * @param string $pathname Path to file currently on disk
+     * @param string $contenthash SHA1 hash of content if known (performance only)
+     *
+     * @return array (contenthash, filesize, newfile)
+     *
+     * @throws file_exception
+     * @throws dml_exception
+     * @throws Exception
+     */
+    public function add_file_from_path($pathname, $contenthash = null) {
+        if (!is_readable($pathname)) {
+            throw new file_exception('storedfilecannotread', '', $pathname);
+        }
+
+        $filesize = filesize($pathname);
+        if ($filesize === false) {
+            throw new file_exception('storedfilecannotread', '', $pathname);
+        }
+        if (is_null($contenthash)) {
+            $contenthash = sha1_file($pathname);
+        }
+        if (is_null($contenthash)) {
+            throw new file_exception('storedfilecannotread', '', $pathname);
+        }
+
+        $contenttype = 'binary/octet-stream';
+        $contentdisposition = "attachment";
+        foreach ($_FILES as $file) {
+            if ($file['tmp_name'] == $pathname) {
+                $contentdisposition = "inline; filename={$file['name']}";
+                $contenttype = $file['type'];
+            }
+        }
+
+        $filename = $this->get_local_path_from_hash($contenthash);
+        $this->upload($pathname, $filename, $contenttype, $contentdisposition);
+
+        return [$contenthash, $filesize, $filename];
+    }
+
+    /**
      * @param stored_file $file
      * @param bool $fetchifnotfound
      *
@@ -278,10 +326,6 @@ class storage_file_system extends file_system {
     }
 
     public function remove_file($contenthash) {
-        // Implemented in storage_file_system.php.
-    }
-
-    public function add_file_from_path($pathname, $contenthash = null) {
         // Implemented in storage_file_system.php.
     }
 }
