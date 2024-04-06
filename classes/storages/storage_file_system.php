@@ -1,0 +1,287 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local_alternative_file_system
+ * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_alternative_file_system\storages;
+
+use cache;
+use dml_exception;
+use Exception;
+use file_exception;
+use file_system;
+use stored_file;
+
+defined('MOODLE_INTERNAL') || die;
+
+global $CFG;
+require_once("{$CFG->dirroot}/lib/filestorage/file_system.php");
+
+class storage_file_system extends file_system {
+
+    /**
+     * @param string $contenthash
+     * @param bool $fetchifnotfound
+     *
+     * @return string
+     *
+     * @throws dml_exception
+     */
+    public function get_local_path_from_hash($contenthash, $fetchifnotfound = false) {
+        $paths = [];
+
+        $config = get_config("local_alternative_file_system");
+        if (isset($config->settings_path[2])) {
+            $paths[] = $config->settings_path;
+        }
+
+        $paths[] = substr($contenthash, 0, 2);
+        $paths[] = substr($contenthash, 2, 2);
+        $paths[] = $contenthash;
+
+        return implode("/", $paths);
+    }
+
+    /**
+     * Add string content to sha1 pool.
+     *
+     * @param string $content file content - binary string
+     *
+     * @return array (contenthash, filesize, newfile)
+     *
+     * @throws Exception
+     */
+    public function add_file_from_string($content) {
+        global $CFG;
+
+        $contenthash = sha1($content);
+        $filesize = strlen($content);
+
+        if ($content === '') {
+            return [$contenthash, $filesize, false];
+        }
+
+        $pathname = "{$CFG->tempdir}/{$contenthash}";
+        file_put_contents($pathname, $content);
+        $upload = $this->add_file_from_path($pathname, $contenthash);
+
+        unlink($pathname);
+        return $upload;
+    }
+
+
+    /**
+     * @param stored_file $file
+     *
+     * @throws file_exception
+     * @throws Exception
+     */
+    public function readfile(\stored_file $file) {
+        $path = $this->get_remote_path_from_hash($file->get_contenthash());
+
+        if (strpos($_SERVER['REQUEST_URI'], "pluginfile.php") >= 1) {
+            if ($file->get_component() == "core" || $file->get_component() == "course") {
+                header("Location: {$path}");
+                die();
+            }
+            if (strpos($_SERVER['REQUEST_URI'], "theme") === 0) {
+                header("Location: {$path}");
+                die();
+            }
+        }
+
+        if ($file->get_filesize() < 1000) {
+            $success = readfile($path);
+        } else {
+            $success = readfile_allow_large($path, $file->get_filesize());
+        }
+
+        if (!$success) {
+            throw new file_exception('storedfilecannotreadfile', $file->get_filename());
+        }
+    }
+
+    /**
+     * Determine whether the file is present on the local file system somewhere.
+     *
+     * @param stored_file $file The file to ensure is available.
+     *
+     * @return bool
+     *
+     * @throws Exception
+     */
+    public function is_file_readable_remotely_by_storedfile(stored_file $file) {
+        if (!$file->get_filesize()) {
+            return true;
+        }
+
+        // Aqui corrigir.
+        return true;
+    }
+
+    /**
+     * Returns information about image.
+     * Information is determined from the file content
+     *
+     * @param stored_file $file The file to inspect
+     *
+     * @return mixed array with width, height and mimetype; false if not an image
+     *
+     * @throws Exception
+     */
+    public function get_imageinfo(stored_file $file) {
+        if (!$this->is_image_from_storedfile($file)) {
+            return false;
+        }
+
+        $hash = $file->get_contenthash();
+        $cache = cache::make('core', 'file_imageinfo');
+        $info = $cache->get($hash);
+        if ($info !== false) {
+            return $info;
+        }
+
+        $path = $this->get_remote_path_from_hash($file->get_contenthash());
+        $info = $this->get_imageinfo_from_path($path);
+        $cache->set($hash, $info);
+        return $info;
+    }
+
+    /**
+     * @param string $contenthash
+     *
+     * @return int
+     *
+     * @throws Exception
+     */
+    public function get_remote_file_size($contenthash) {
+
+        $url = $this->get_remote_path_from_hash($contenthash);
+        $curl = curl_init($url);
+
+        // Issue a HEAD request and follow any redirects.
+        curl_setopt($curl, CURLOPT_NOBODY, true);
+        curl_setopt($curl, CURLOPT_HEADER, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+
+        $data = curl_exec($curl);
+        curl_close($curl);
+
+        if ($data) {
+            if (preg_match("/^HTTP\/1\.[01] (\d\d\d)/", $data, $matches)) {
+                $status = (int)$matches[1];
+                if ($status != 200 || ($status > 300 && $status <= 308)) {
+                    return 0;
+                }
+            }
+
+            if (preg_match("/Content-Length: (\d+)/", $data, $matches)) {
+                return (int)$matches[1];
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param string $contenthash
+     * @param string $storage
+     *
+     * @throws dml_exception
+     */
+    public function report_save($contenthash, $storage) {
+        global $DB;
+
+        $data = [
+            "contenthash" => $contenthash,
+            "storage" => $storage,
+            "timemodifield" => time(),
+        ];
+        $DB->insert_record("alternative_file_system_file", $data);
+    }
+
+    /**
+     * @return int
+     *
+     * @throws dml_exception
+     */
+    public function sending_count() {
+        global $DB;
+
+        $config = get_config('local_alternative_file_system');
+
+        $sql = "SELECT COUNT(contenthash) AS num_files
+                  FROM {alternative_file_system_file}
+                 WHERE storage = '{$config->settings_destino}'";
+        $result = $DB->get_record_sql($sql);
+        return $result->num_files;
+    }
+
+    /**
+     * @return int
+     *
+     * @throws dml_exception
+     */
+    public function missing_count() {
+        global $DB;
+
+        $config = get_config('local_alternative_file_system');
+
+        $sql = "SELECT COUNT(*) AS num_files
+                  FROM {files}
+                 WHERE contenthash NOT IN (
+                        SELECT contenthash
+                          FROM {alternative_file_system_file}
+                         WHERE storage = '{$config->settings_destino}'
+                     )
+                   AND filename    LIKE '__%'
+                   AND filesize    > 2
+                   AND mimetype    IS NOT NULL";
+        $result = $DB->get_record_sql($sql);
+        return $result->num_files;
+    }
+
+    /**
+     * @param stored_file $file
+     * @param bool $fetchifnotfound
+     *
+     * @throws Exception
+     */
+    public function get_local_path_from_storedfile(stored_file $file, $fetchifnotfound = false) {
+        // Implemented in storage_file_system.php.
+    }
+
+    protected function get_remote_path_from_hash($contenthash) {
+        // Implemented in storage_file_system.php.
+    }
+
+    public function copy_content_from_storedfile(stored_file $file, $target) {
+        // Implemented in storage_file_system.php.
+    }
+
+    public function remove_file($contenthash) {
+        // Implemented in storage_file_system.php.
+    }
+
+    public function add_file_from_path($pathname, $contenthash = null) {
+        // Implemented in storage_file_system.php.
+    }
+}
