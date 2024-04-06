@@ -74,13 +74,23 @@ if ($hassiteconfig) {
 
                 if ($s3filesystem->missing_count()) {
                     $a = [
-                        'missing' => $externalfilesystem->missing_count(),
-                        'sending' => $externalfilesystem->sending_count(),
+                        'missing' => $s3filesystem->missing_count(),
+                        'sending' => $s3filesystem->sending_count(),
                     ];
-                    $string = get_string('settings_migrate', 'local_alternative_file_system', $datalang);
-                    $setting = new admin_setting_heading('local_alternative_file_system/header2',
-                        get_string('migrate_total', 'local_alternative_file_system', $a),
-                        $PAGE->get_renderer('core')->render(new notification($string, notification::NOTIFY_INFO, false)));
+                    $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);
+                    $string2 = get_string('settings_migrate', 'local_alternative_file_system', $datalang);
+                    $setting = new admin_setting_heading('local_alternative_file_system/header2', '',
+                        $PAGE->get_renderer('core')->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
+                        $PAGE->get_renderer('core')->render(new notification($string2, notification::NOTIFY_INFO, false)));
+                    $settings->add($setting);
+                } else {
+                    $a = [
+                        'missing' => $s3filesystem->missing_count(),
+                        'sending' => $s3filesystem->sending_count(),
+                    ];
+                    $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);;
+                    $setting = new admin_setting_heading('local_alternative_file_system/header2', '',
+                        $PAGE->get_renderer('core')->render(new notification($string1, notification::NOTIFY_SUCCESS, false)));
                     $settings->add($setting);
                 }
 
@@ -138,9 +148,24 @@ if ($hassiteconfig) {
                 $settings->add($setting);
 
                 if ($gcsfilesystem->missing_count()) {
-                    $string = get_string('settings_migrate', 'local_alternative_file_system', $datalang);
+                    $a = [
+                        'missing' => $gcsfilesystem->missing_count(),
+                        'sending' => $gcsfilesystem->sending_count(),
+                    ];
+                    $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);
+                    $string2 = get_string('settings_migrate', 'local_alternative_file_system', $datalang);
                     $setting = new admin_setting_heading('local_alternative_file_system/header2', '',
-                        $PAGE->get_renderer('core')->render(new notification($string, notification::NOTIFY_INFO, false)));
+                        $PAGE->get_renderer('core')->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
+                        $PAGE->get_renderer('core')->render(new notification($string2, notification::NOTIFY_INFO, false)));
+                    $settings->add($setting);
+                } else {
+                    $a = [
+                        'missing' => $gcsfilesystem->missing_count(),
+                        'sending' => $gcsfilesystem->sending_count(),
+                    ];
+                    $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);;
+                    $setting = new admin_setting_heading('local_alternative_file_system/header2', '',
+                        $PAGE->get_renderer('core')->render(new notification($string1, notification::NOTIFY_SUCCESS, false)));
                     $settings->add($setting);
                 }
 
