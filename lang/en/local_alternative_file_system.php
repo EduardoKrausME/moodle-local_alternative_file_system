@@ -22,29 +22,29 @@
 
 $string['pluginname'] = 'Alternative File System';
 
-$string['settings_destino'] = 'Destino de armazenamento';
-$string['settings_destinodesc'] = 'Escolha o destino de armazenamento e salve para carregar os dados relacionados ao armazenamento.';
+$string['settings_destino'] = 'Storage Destination';
+$string['settings_destinodesc'] = 'Choose the storage destination and save to load storage-related data.';
 
-$string['settings_s3_region'] = 'Região do {$a->local}';
-$string['settings_s3_regiondesc'] = 'A região onde está localizado o bucket do {$a->local}, por exemplo, "{$a->ex_region}".';
-$string['settings_s3_credentials_key'] = 'Chave de Acesso do {$a->local}';
-$string['settings_s3_credentials_keydesc'] = 'A chave de acesso utilizada para autenticar com o serviço {$a->local}.';
-$string['settings_s3_credentials_secret'] = 'Chave secreta do {$a->local}';
-$string['settings_s3_credentials_secretdesc'] = 'A chave secreta utilizada para autenticar com o serviço {$a->local}.';
+$string['settings_s3_region'] = '{$a->local} Region';
+$string['settings_s3_regiondesc'] = 'The region where the {$a->local} bucket is located, for example, "{$a->ex_region}".';
+$string['settings_s3_credentials_key'] = '{$a->local} Access Key';
+$string['settings_s3_credentials_keydesc'] = 'The access key used to authenticate with the {$a->local} service.';
+$string['settings_s3_credentials_secret'] = '{$a->local} Secret Key';
+$string['settings_s3_credentials_secretdesc'] = 'The secret key used to authenticate with the {$a->local} service.';
 
-$string['settings_gcs_keyfile'] = 'Conteúdo do google-storage.json';
-$string['settings_gcs_keyfiledesc'] = 'Cole aqui o conteúdo do arquivo "google-storage.json"';
+$string['settings_gcs_keyfile'] = 'Google-storage.json Content';
+$string['settings_gcs_keyfiledesc'] = 'Paste here the content of the "google-storage.json" file.';
 
-$string['settings_bucketname'] = 'Nome do Bucket no {$a->local}';
-$string['settings_bucketnamedesc'] = 'O nome único atribuído ao bucket no {$a->local}.';
-$string['settings_path'] = 'Caminho do Objeto no {$a->local}';
-$string['settings_pathdesc'] = 'O caminho dentro do bucket onde os objetos serão armazenados. Somente aceito letras e números';
+$string['settings_bucketname'] = '{$a->local} Bucket Name';
+$string['settings_bucketnamedesc'] = 'The unique name assigned to the bucket in {$a->local}.';
+$string['settings_path'] = '{$a->local} Object Path';
+$string['settings_pathdesc'] = 'The path within the bucket where objects will be stored. Only letters and numbers are accepted.';
 
-$string['settings_success'] = '<h2>Os dados estão corretos.</h2>Por favor, tenha cautela ao modificar as configurações, pois qualquer alteração incorreta pode resultar na inacessibilidade dos arquivos armazenados.';
-$string['settings_migrate'] = 'Utilize o serviço <a target="_blank" href="{$a->url}">move-to-external.php</a> para migrar os dados locais para o {$a->local}.';
-$string['migrate_title'] = 'Migrar local para Storage remoto';
-$string['migrate_total'] = '<p>Você possui <strong>{$a->missing}</strong> arquivos locais aguardando migração, enquanto <strong>{$a->sending}</strong> arquivos já foram migrados para o ambiente remoto.</p>';
-$string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Executar agora (pode demorar bastante tempo)</a></p>';
+$string['settings_success'] = '<h2>Data is correct.</h2>Please be cautious when modifying settings, as any incorrect changes can result in inaccessibility of stored files.';
+$string['settings_migrate'] = 'Use the service <a target="_blank" href="{$a->url}">move-to-external.php</a> to migrate local data to {$a->local}.';
+$string['migrate_title'] = 'Migrate Local to Remote Storage';
+$string['migrate_total'] = '<p>You have <strong>{$a->missing}</strong> local files awaiting migration, while <strong>{$a->sending}</strong> files have already been migrated to the remote environment.</p>';
+$string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Execute Now (may take a long time)</a></p>';
 
-$string['instruction_title'] = 'Instruções de instalação';
-$string['instruction_install'] = 'Você precisa adicionar o código abaixo no config.php:<pre>$CFG->alternative_file_system_class = "\local_alternative_file_system\external_file_system";</pre>';
+$string['instruction_title'] = 'Installation Instructions';
+$string['instruction_install'] = 'You need to add the code below to config.php:<pre>$CFG->alternative_file_system_class = "\local_alternative_file_system\external_file_system";</pre>';
