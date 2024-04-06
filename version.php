@@ -22,9 +22,9 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2024040503;
+$plugin->version  = 2024040600;
 $plugin->requires = 2017051500;
-$plugin->release = '1.2';
+$plugin->release = '1.2.0';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'local_alternative_file_system';
 
