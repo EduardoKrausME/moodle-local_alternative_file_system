@@ -30,6 +30,9 @@ if ($hassiteconfig) {
 
     global $CFG, $PAGE;
 
+    $decsep = get_string('decsep', 'langconfig');
+    $thousandssep = get_string('thousandssep', 'langconfig');
+
     $settings = new admin_settingpage('local_alternative_file_system', get_string('pluginname', 'local_alternative_file_system'));
 
     $ADMIN->add('localplugins', $settings);
@@ -74,8 +77,8 @@ if ($hassiteconfig) {
 
                 if ($s3filesystem->missing_count()) {
                     $a = [
-                        'missing' => $s3filesystem->missing_count(),
-                        'sending' => $s3filesystem->sending_count(),
+                        'missing' => number_format($s3filesystem->missing_count(), 0, $decsep, $thousandssep),
+                        'sending' => number_format($s3filesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);
                     $string2 = get_string('settings_migrate', 'local_alternative_file_system', $datalang);
@@ -85,8 +88,8 @@ if ($hassiteconfig) {
                     $settings->add($setting);
                 } else {
                     $a = [
-                        'missing' => $s3filesystem->missing_count(),
-                        'sending' => $s3filesystem->sending_count(),
+                        'missing' => number_format($s3filesystem->missing_count(), 0, $decsep, $thousandssep),
+                        'sending' => number_format($s3filesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);;
                     $setting = new admin_setting_heading('local_alternative_file_system/header2', '',
@@ -149,8 +152,8 @@ if ($hassiteconfig) {
 
                 if ($gcsfilesystem->missing_count()) {
                     $a = [
-                        'missing' => $gcsfilesystem->missing_count(),
-                        'sending' => $gcsfilesystem->sending_count(),
+                        'missing' => number_format($gcsfilesystem->missing_count(), 0, $decsep, $thousandssep),
+                        'sending' => number_format($gcsfilesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);
                     $string2 = get_string('settings_migrate', 'local_alternative_file_system', $datalang);
@@ -160,8 +163,8 @@ if ($hassiteconfig) {
                     $settings->add($setting);
                 } else {
                     $a = [
-                        'missing' => $gcsfilesystem->missing_count(),
-                        'sending' => $gcsfilesystem->sending_count(),
+                        'missing' => number_format($gcsfilesystem->missing_count(), 0, $decsep, $thousandssep),
+                        'sending' => number_format($gcsfilesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string('migrate_total', 'local_alternative_file_system', $a);;
                     $setting = new admin_setting_heading('local_alternative_file_system/header2', '',
