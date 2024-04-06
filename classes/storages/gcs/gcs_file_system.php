@@ -98,7 +98,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
         $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
         $object = $bucket->object($this->get_local_path_from_hash($contenthash));
 
-        return $object->signedUrl(500);
+        return $object->signedUrl(time() + 1500);
     }
 
     /**
