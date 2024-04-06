@@ -186,49 +186,6 @@ class s3_file_system extends storage_file_system implements i_file_system {
     }
 
     /**
-     * Add file content to sha1 pool.
-     *
-     * @param string $pathname Path to file currently on disk
-     * @param string $contenthash SHA1 hash of content if known (performance only)
-     *
-     * @return array (contenthash, filesize, newfile)
-     *
-     * @throws file_exception
-     * @throws dml_exception
-     * @throws Exception
-     */
-    public function add_file_from_path($pathname, $contenthash = null) {
-        if (!is_readable($pathname)) {
-            throw new file_exception('storedfilecannotread', '', $pathname);
-        }
-
-        $filesize = filesize($pathname);
-        if ($filesize === false) {
-            throw new file_exception('storedfilecannotread', '', $pathname);
-        }
-        if (is_null($contenthash)) {
-            $contenthash = sha1_file($pathname);
-        }
-        if (is_null($contenthash)) {
-            throw new file_exception('storedfilecannotread', '', $pathname);
-        }
-
-        $contenttype = 'binary/octet-stream';
-        $contentdisposition = "attachment";
-        foreach ($_FILES as $file) {
-            if ($file['tmp_name'] == $pathname) {
-                $contentdisposition = "inline; filename={$file['name']}";
-                $contenttype = $file['type'];
-            }
-        }
-
-        $filename = $this->get_local_path_from_hash($contenthash);
-        $this->upload($pathname, $filename, $contenttype, $contentdisposition);
-
-        return [$contenthash, $filesize, $filename];
-    }
-
-    /**
      * @param string $sourcefile
      * @param string $filename
      * @param string $contenttype
