@@ -119,7 +119,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
 
         $object->copy($target);
 
-        $this->report_save($file->get_contenthash(), "gcs");
+        $this->report_save($file->get_contenthash());
 
         return true;
     }
@@ -171,6 +171,6 @@ class gcs_file_system extends storage_file_system implements i_file_system {
         $bucket->upload($stream, $options);
 
         $contenthash = pathinfo($filename, PATHINFO_FILENAME);
-        $this->report_save($contenthash, "gcs");
+        $this->report_save($contenthash);
     }
 }

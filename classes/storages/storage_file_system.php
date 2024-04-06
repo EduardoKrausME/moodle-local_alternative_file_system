@@ -94,23 +94,17 @@ class storage_file_system extends file_system {
      * @throws Exception
      */
     public function readfile(\stored_file $file) {
-        $path = $this->get_remote_path_from_hash($file->get_contenthash());
+        $url = $this->get_remote_path_from_hash($file->get_contenthash());
 
         if (strpos($_SERVER['REQUEST_URI'], "pluginfile.php") >= 1) {
-            if ($file->get_component() == "core" || $file->get_component() == "course") {
-                header("Location: {$path}");
-                die();
-            }
-            if (strpos($_SERVER['REQUEST_URI'], "theme") === 0) {
-                header("Location: {$path}");
-                die();
-            }
+            header("Location: {$url}");
+            die();
         }
 
         if ($file->get_filesize() < 1000) {
-            $success = readfile($path);
+            $success = readfile($url);
         } else {
-            $success = readfile_allow_large($path, $file->get_filesize());
+            $success = readfile_allow_large($url, $file->get_filesize());
         }
 
         if (!$success) {
@@ -203,16 +197,19 @@ class storage_file_system extends file_system {
 
     /**
      * @param string $contenthash
-     * @param string $storage
      *
      * @return bool
+     *
+     * @throws dml_exception
      */
-    public function report_save($contenthash, $storage) {
+    public function report_save($contenthash) {
         global $DB;
+
+        $config = get_config('local_alternative_file_system');
 
         $data = [
             "contenthash" => $contenthash,
-            "storage" => $storage,
+            "storage" => $config->settings_destino,
             "timemodifield" => time(),
         ];
         try {

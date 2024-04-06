@@ -113,18 +113,18 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @return string The full path to the content file
      *
      * @throws dml_exception
+     * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false) {
         $config = get_config("local_alternative_file_system");
 
-        $path = $this->get_local_path_from_hash($contenthash);
-        if ($config->settings_destino == 's3') {
-            return "https://{$config->settings_s3_bucketname}.{$config->settings_s3_region}.s3.amazonaws.com/{$path}";
-        } else if ($config->settings_destino == 'space') {
-            return "https://{$config->settings_s3_bucketname}.{$config->settings_s3_region}.digitaloceanspaces.com/{$path}";
-        }
+        $cmd = $this->get_instance()->getCommand('GetObject', [
+            'Bucket' => $config->settings_s3_bucketname,
+            'Key' => $this->get_local_path_from_hash($contenthash)
+        ]);
 
-        return "";
+        $request = $this->get_instance()->createPresignedRequest($cmd, time() + 1500);
+        return (string)$request->getUri();
     }
 
     /**
@@ -156,7 +156,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
             'CopySource' => $this->get_remote_path_from_storedfile($file),
         ]);
 
-        $this->report_save($file->get_contenthash(), "gcs");
+        $this->report_save($file->get_contenthash());
 
         return true;
     }
@@ -201,12 +201,11 @@ class s3_file_system extends storage_file_system implements i_file_system {
             'Bucket' => $config->settings_s3_bucketname,
             'Key' => $filename,
             'SourceFile' => $sourcefile,
-            'ACL' => 'public-read',
             'ContentType' => $contenttype,
             'ContentDisposition' => $contentdisposition,
         ]);
 
         $contenthash = pathinfo($filename, PATHINFO_FILENAME);
-        $this->report_save($contenthash, "gcs");
+        $this->report_save($contenthash);
     }
 }
