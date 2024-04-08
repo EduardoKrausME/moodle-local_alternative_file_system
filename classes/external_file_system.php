@@ -14,12 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package    local_alternative_file_system
- * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_alternative_file_system;
 
 use dml_exception;
@@ -36,7 +30,13 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
 
-
+/**
+ * external_file_system file.
+ *
+ * @package    local_alternative_file_system
+ * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class external_file_system extends file_system implements i_file_system {
 
     /** @var gcs_file_system */
@@ -63,6 +63,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * Test config function.
+     *
      * @throws dml_exception
      *
      * @throws Exception
@@ -72,6 +74,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * get_local_path_from_hash function.
+     *
      * @param string $contenthash
      * @param bool $fetchifnotfound
      *
@@ -90,7 +94,7 @@ class external_file_system extends file_system implements i_file_system {
      *
      * See https://secure.php.net/manual/en/wrappers.php for further information on valid wrappers.
      *
-     * @param string $contenthash The content hash
+     * @param string $contenthash
      * @param bool $fetchifnotfound
      *
      * @return string The full path to the content file
@@ -102,6 +106,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * get_local_path_from_storedfile function.
+     *
      * @param stored_file $file
      * @param bool $fetchifnotfound
      *
@@ -114,6 +120,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * get_remote_file_size function.
+     *
      * @param string $contenthash
      *
      * @return int
@@ -169,6 +177,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * upload function.
+     *
      * @param string $sourcefile
      * @param string $filename
      * @param string $contenttype
@@ -195,6 +205,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * readfile function.
+     *
      * @param stored_file $file
      *
      * @throws file_exception
@@ -233,6 +245,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * Sending count function.
+     *
      * @return int
      *
      * @throws dml_exception
@@ -242,6 +256,8 @@ class external_file_system extends file_system implements i_file_system {
     }
 
     /**
+     * Missing count function.
+     *
      * @return int
      *
      * @throws dml_exception

@@ -14,12 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package    local_alternative_file_system
- * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_alternative_file_system;
 
 use dml_exception;
@@ -27,9 +21,18 @@ use Exception;
 use file_exception;
 use stored_file;
 
+/**
+ * i_file_system file.
+ *
+ * @package    local_alternative_file_system
+ * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 interface i_file_system {
 
     /**
+     * Test config function.
+     *
      * @throws dml_exception
      *
      * @throws Exception
@@ -37,11 +40,24 @@ interface i_file_system {
     public function test_config();
 
     /**
+     * Sending count function.
+     *
+     * @return int
+     *
+     * @throws dml_exception
+     */
+    public function sending_count();
+
+    /**
+     * Missing count function.
+     *
      * @return int
      */
     public function missing_count();
 
     /**
+     * get_local_path_from_hash function.
+     *
      * @param string $contenthash
      * @param bool $fetchifnotfound
      *
@@ -52,7 +68,13 @@ interface i_file_system {
     public function get_local_path_from_hash($contenthash, $fetchifnotfound = false);
 
     /**
-     * @param string $contenthash The content hash
+     * Get the full path for the specified hash, including the path to the filedir.
+     *
+     * This is typically either the same as the local filepath, or it is a streamable resource.
+     *
+     * See https://secure.php.net/manual/en/wrappers.php for further information on valid wrappers.
+     *
+     * @param string $contenthash
      * @param bool $fetchifnotfound
      *
      * @return string The full path to the content file
@@ -62,6 +84,8 @@ interface i_file_system {
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false);
 
     /**
+     * get_local_path_from_storedfile function.
+     *
      * @param stored_file $file
      * @param bool $fetchifnotfound
      *
@@ -72,6 +96,8 @@ interface i_file_system {
     public function get_local_path_from_storedfile(stored_file $file, $fetchifnotfound = false);
 
     /**
+     * get_remote_file_size function.
+     *
      * @param string $contenthash
      *
      * @return int
@@ -81,6 +107,8 @@ interface i_file_system {
     public function get_remote_file_size($contenthash);
 
     /**
+     * Copy content of file to given pathname.
+     *
      * @param stored_file $file The file to be copied
      * @param string $target real path to the new file
      *
@@ -91,6 +119,8 @@ interface i_file_system {
     public function copy_content_from_storedfile(stored_file $file, $target);
 
     /**
+     * Removes the file.
+     *
      * @param string $contenthash
      *
      * @return bool
@@ -101,6 +131,8 @@ interface i_file_system {
     public function remove_file($contenthash);
 
     /**
+     * Add file content to sha1 pool.
+     *
      * @param string $pathname Path to file currently on disk
      * @param string $contenthash SHA1 hash of content if known (performance only)
      *
@@ -113,6 +145,8 @@ interface i_file_system {
     public function add_file_from_path($pathname, $contenthash = null);
 
     /**
+     * upload function.
+     *
      * @param string $sourcefile
      * @param string $filename
      * @param string $contenttype
@@ -121,6 +155,8 @@ interface i_file_system {
     public function upload($sourcefile, $filename, $contenttype, $contentdisposition);
 
     /**
+     * Add string content to sha1 pool.
+     *
      * @param string $content file content - binary string
      *
      * @return array (contenthash, filesize, newfile)
@@ -131,6 +167,8 @@ interface i_file_system {
     public function add_file_from_string($content);
 
     /**
+     * readfile function.
+     *
      * @param stored_file $file
      *
      * @throws file_exception
@@ -139,6 +177,8 @@ interface i_file_system {
     public function readfile(stored_file $file);
 
     /**
+     * Determine whether the file is present on the local file system somewhere.
+     *
      * @param stored_file $file The file to ensure is available.
      *
      * @return bool
@@ -148,6 +188,9 @@ interface i_file_system {
     public function is_file_readable_remotely_by_storedfile(stored_file $file);
 
     /**
+     * Returns information about image.
+     * Information is determined from the file content
+     *
      * @param stored_file $file The file to inspect
      *
      * @return mixed array with width, height and mimetype; false if not an image

@@ -14,12 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package    local_alternative_file_system
- * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_alternative_file_system\storages\gcs;
 
 use dml_exception;
@@ -32,9 +26,18 @@ use stored_file;
 defined('MOODLE_INTERNAL') || die;
 require_once(__DIR__ . "/vendor/autoload.php");
 
+/**
+ * gcs_file_system file.
+ *
+ * @package    local_alternative_file_system
+ * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class gcs_file_system extends storage_file_system implements i_file_system {
 
     /**
+     * get_instance function.
+     *
      * @return StorageClient
      *
      * @throws Exception
@@ -48,13 +51,15 @@ class gcs_file_system extends storage_file_system implements i_file_system {
         $config = get_config("local_alternative_file_system");
 
         $storage = new StorageClient([
-            'keyFile' => json_decode($config->settings_gcs_keyfile, true)
+            'keyFile' => json_decode($config->settings_gcs_keyfile, true),
         ]);
 
         return $storage;
     }
 
     /**
+     * Test config function.
+     *
      * @throws dml_exception
      *
      * @throws Exception
@@ -83,13 +88,18 @@ class gcs_file_system extends storage_file_system implements i_file_system {
     }
 
     /**
-     * @param string $contenthash The content hash
+     * Get the full path for the specified hash, including the path to the filedir.
+     *
+     * This is typically either the same as the local filepath, or it is a streamable resource.
+     *
+     * See https://secure.php.net/manual/en/wrappers.php for further information on valid wrappers.
+     *
+     * @param string $contenthash
      * @param bool $fetchifnotfound
      *
      * @return string The full path to the content file
      *
      * @throws dml_exception
-     * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false) {
 
@@ -149,6 +159,8 @@ class gcs_file_system extends storage_file_system implements i_file_system {
     }
 
     /**
+     * upload function.
+     *
      * @param string $sourcefile
      * @param string $filename
      * @param string $contenttype

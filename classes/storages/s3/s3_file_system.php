@@ -14,12 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package    local_alternative_file_system
- * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_alternative_file_system\storages\s3;
 
 use Aws\S3\S3Client;
@@ -33,9 +27,18 @@ use stored_file;
 defined('MOODLE_INTERNAL') || die;
 require_once(__DIR__ . "/vendor/autoload.php");
 
+/**
+ * s3_file_system file.
+ *
+ * @package    local_alternative_file_system
+ * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class s3_file_system extends storage_file_system implements i_file_system {
 
     /**
+     * Test config function.
+     *
      * @throws dml_exception
      *
      * @throws Exception
@@ -68,11 +71,13 @@ class s3_file_system extends storage_file_system implements i_file_system {
         ]);
         $this->get_instance()->deleteObject([
             'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $filename
+            'Key' => $filename,
         ]);
     }
 
     /**
+     * get_instance function.
+     *
      * @return S3Client
      *
      * @throws Exception
@@ -98,8 +103,8 @@ class s3_file_system extends storage_file_system implements i_file_system {
             'endpoint' => $endpoint,
             'credentials' => [
                 'key' => $config->settings_s3_credentials_key,
-                'secret' => $config->settings_s3_credentials_secret
-            ]
+                'secret' => $config->settings_s3_credentials_secret,
+            ],
         ];
         $s3client = new S3Client($args);
 
@@ -107,20 +112,25 @@ class s3_file_system extends storage_file_system implements i_file_system {
     }
 
     /**
-     * @param string $contenthash The content hash
+     * Get the full path for the specified hash, including the path to the filedir.
+     *
+     * This is typically either the same as the local filepath, or it is a streamable resource.
+     *
+     * See https://secure.php.net/manual/en/wrappers.php for further information on valid wrappers.
+     *
+     * @param string $contenthash
      * @param bool $fetchifnotfound
      *
      * @return string The full path to the content file
      *
      * @throws dml_exception
-     * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false) {
         $config = get_config("local_alternative_file_system");
 
         $cmd = $this->get_instance()->getCommand('GetObject', [
             'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $this->get_local_path_from_hash($contenthash)
+            'Key' => $this->get_local_path_from_hash($contenthash),
         ]);
 
         $request = $this->get_instance()->createPresignedRequest($cmd, time() + 1500);
@@ -128,6 +138,10 @@ class s3_file_system extends storage_file_system implements i_file_system {
     }
 
     /**
+     * Get the full path for the specified hash, including the path to the filedir.
+     * This is typically either the same as the local filepath, or it is a streamable resource.
+     * See https://secure.php.net/manual/en/wrappers.php for further information on valid wrappers.
+     *
      * @param stored_file $file
      *
      * @return string
@@ -177,7 +191,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $config = get_config("local_alternative_file_system");
         $this->get_instance()->deleteObject([
             'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $this->get_local_path_from_hash($contenthash)
+            'Key' => $this->get_local_path_from_hash($contenthash),
         ]);
 
         $DB->delete_records("alternative_file_system_file", ["contenthash" => $contenthash]);
@@ -186,6 +200,8 @@ class s3_file_system extends storage_file_system implements i_file_system {
     }
 
     /**
+     * upload function.
+     *
      * @param string $sourcefile
      * @param string $filename
      * @param string $contenttype

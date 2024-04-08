@@ -14,12 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package    local_alternative_file_system
- * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_alternative_file_system\storages;
 
 use cache;
@@ -34,9 +28,18 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("{$CFG->dirroot}/lib/filestorage/file_system.php");
 
+/**
+ * storage_file_system file.
+ *
+ * @package    local_alternative_file_system
+ * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class storage_file_system extends file_system {
 
     /**
+     * get_local_path_from_hash function.
+     *
      * @param string $contenthash
      * @param bool $fetchifnotfound
      *
@@ -88,6 +91,8 @@ class storage_file_system extends file_system {
 
 
     /**
+     * readfile function.
+     *
      * @param stored_file $file
      *
      * @throws file_exception
@@ -138,6 +143,7 @@ class storage_file_system extends file_system {
      *
      * @return mixed array with width, height and mimetype; false if not an image
      *
+     * @throws \coding_exception
      * @throws Exception
      */
     public function get_imageinfo(stored_file $file) {
@@ -159,6 +165,8 @@ class storage_file_system extends file_system {
     }
 
     /**
+     * get_remote_file_size function.
+     *
      * @param string $contenthash
      *
      * @return int
@@ -196,6 +204,8 @@ class storage_file_system extends file_system {
     }
 
     /**
+     * report_save function.
+     *
      * @param string $contenthash
      *
      * @return bool
@@ -221,6 +231,8 @@ class storage_file_system extends file_system {
     }
 
     /**
+     * Sending count function.
+     *
      * @return int
      *
      * @throws dml_exception
@@ -238,6 +250,8 @@ class storage_file_system extends file_system {
     }
 
     /**
+     * Missing count function.
+     *
      * @return int
      *
      * @throws dml_exception
@@ -305,6 +319,8 @@ class storage_file_system extends file_system {
     }
 
     /**
+     * get_local_path_from_storedfile function.
+     *
      * @param stored_file $file
      * @param bool $fetchifnotfound
      *
@@ -314,14 +330,47 @@ class storage_file_system extends file_system {
         // Implemented in storage_file_system.php.
     }
 
-    protected function get_remote_path_from_hash($contenthash) {
+    /**
+     * Get the full path for the specified hash, including the path to the filedir.
+     *
+     * This is typically either the same as the local filepath, or it is a streamable resource.
+     *
+     * See https://secure.php.net/manual/en/wrappers.php for further information on valid wrappers.
+     *
+     * @param string $contenthash
+     *
+     * @return string The full path to the content file
+     *
+     * @throws dml_exception
+     */
+    public function get_remote_path_from_hash($contenthash) {
         // Implemented in storage_file_system.php.
     }
 
+    /**
+     * Copy content of file to given pathname.
+     *
+     * @param stored_file $file The file to be copied
+     * @param string $target real path to the new file
+     *
+     * @return bool success
+     *
+     * @throws Exception
+     */
     public function copy_content_from_storedfile(stored_file $file, $target) {
         // Implemented in storage_file_system.php.
     }
 
+    /**
+     * Removes the file.
+     *
+     * @param string $contenthash
+     *
+     * @return bool
+     *
+     * @throws dml_exception
+     * @throws Exception
+     */
     public function remove_file($contenthash) {
         // Implemented in storage_file_system.php.
     }

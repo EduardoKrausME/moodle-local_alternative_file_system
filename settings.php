@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Settings file.
+ *
  * @package    local_alternative_file_system
  * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -39,9 +41,10 @@ if ($hassiteconfig) {
 
     if (!empty($CFG->alternative_file_system_class)) {
         $settingsdestinos = [
+            '' => get_string('settings_local', 'local_alternative_file_system'),
             's3' => 'Amazon S3',
             'space' => 'Digital Ocean Space',
-            'gcs' => 'Google Cloud Storage'
+            'gcs' => 'Google Cloud Storage',
         ];
         $settings->add(new admin_setting_configselect(
             'local_alternative_file_system/settings_destino',

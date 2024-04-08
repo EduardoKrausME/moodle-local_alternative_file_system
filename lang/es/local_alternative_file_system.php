@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Lang es file.
+ *
  * @package    local_alternative_file_system
  * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,6 +26,8 @@ $string['pluginname'] = 'Sistema de Archivos Alternativo';
 
 $string['settings_destino'] = 'Destino de almacenamiento';
 $string['settings_destinodesc'] = 'Elige el destino de almacenamiento y guarda para cargar los datos relacionados con el almacenamiento.';
+
+$string['settings_local'] = 'Archivos locales en Moodle';
 
 $string['settings_s3_region'] = 'Región de {$a->local}';
 $string['settings_s3_regiondesc'] = 'La región donde se encuentra el bucket de {$a->local}, por ejemplo, "{$a->ex_region}".';
@@ -48,3 +52,5 @@ $string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Ejecu
 
 $string['instruction_title'] = 'Instrucciones de instalación';
 $string['instruction_install'] = 'Necesitas agregar el siguiente código en config.php:<pre>$CFG->alternative_file_system_class = "\local_alternative_file_system\external_file_system";</pre>';
+
+$string['privacy:no_data_reason'] = 'El complemento del Sistema de Archivos Alternativo no almacena ningún dato personal.';
