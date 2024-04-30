@@ -53,7 +53,7 @@ class CurlMultiHandler {
 
     public function __get($name) {
         if ($name === '_mh') {
-            $this->_mh = curl_multi_init();
+            @$this->_mh = curl_multi_init();
 
             foreach ($this->options as $option => $value) {
                 // A warning is raised in case of a wrong option.

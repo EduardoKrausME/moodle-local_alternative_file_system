@@ -24,49 +24,7 @@
  * @param int $oldversion
  *
  * @return bool
- *
- * @throws ddl_exception
- * @throws ddl_table_missing_exception
- * @throws dml_exception
- * @throws downgrade_exception
- * @throws upgrade_exception
  */
 function xmldb_local_alternative_file_system_upgrade($oldversion) {
-    global $DB;
-
-    $dbman = $DB->get_manager();
-
-    if ($oldversion < 2024020501) {
-        $table = new xmldb_table('local_alternative_file_system_usage');
-        $field = new xmldb_field('model', XMLDB_TYPE_CHAR, '40', null, true, null, null, 'receive');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        $model = get_config('local_alternative_file_system', 'model');
-        $sql = "UPDATE {local_alternative_file_system_usage} SET model = '{$model}'";
-        $DB->execute($sql);
-
-        upgrade_plugin_savepoint(true, 2024020501, 'local', 'alternative_file_system');
-    }
-
-    if ($oldversion < 2024040500) {
-        $table = new xmldb_table('local_alternative_file_system_usage');
-        $field = new xmldb_field('datecreated', XMLDB_TYPE_CHAR, '10', null, true, null, null, 'timecreated');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        $usages = $DB->get_records('local_alternative_file_system_usage');
-        foreach ($usages as $usage) {
-            $usage->datecreated = date("Y-m-d", $usage->timecreated);
-            $DB->update_record("local_alternative_file_system_usage", $usage);
-        }
-
-        upgrade_plugin_savepoint(true, 2024040500, 'local', 'alternative_file_system');
-    }
-
     return true;
 }

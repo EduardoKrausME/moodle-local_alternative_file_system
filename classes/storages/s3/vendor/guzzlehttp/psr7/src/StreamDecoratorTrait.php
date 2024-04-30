@@ -10,6 +10,7 @@ use Psr\Http\Message\StreamInterface;
  * @property StreamInterface stream
  */
 trait StreamDecoratorTrait {
+
     /**
      * @param StreamInterface $stream Stream to decorate
      */
@@ -27,7 +28,7 @@ trait StreamDecoratorTrait {
      */
     public function __get($name) {
         if ($name == 'stream') {
-            $this->stream = $this->createStream();
+            @$this->stream = $this->createStream();
             return $this->stream;
         }
 
