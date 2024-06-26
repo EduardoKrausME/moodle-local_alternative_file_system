@@ -36,7 +36,7 @@ This improves the user experience, enhances resource management, and provides gr
 After installing the plugin, it is necessary to edit the file ``config.php`` and include the following line before the call ``require_once( __DIR__ . '/lib/setup.php' );``.
 
 ```php
-$CFG->alternative_file_system_class = "\local_alternative_file_system\external_file_system";
+$CFG->alternative_file_system_class = "\\local_alternative_file_system\\external_file_system";
 ```
 
 This line changes the file system class to the plugin's. Make sure to add this line in the appropriate location within the ``config.php`` file to ensure the plugin operates correctly.
