@@ -50,39 +50,40 @@ if (optional_param('execute', false, PARAM_INT)) {
 
     $sql = "SELECT id, contenthash, mimetype, filename
               FROM {files}
-             WHERE contenthash NOT IN (
-                    SELECT contenthash
-                      FROM {alternative_file_system_file}
-                     WHERE storage = '{$config->settings_destino}'
-                 )
-               AND filename    LIKE '__%'
-               AND filesize    > 2
-               AND mimetype    IS NOT NULL";
+             WHERE filename LIKE '__%'
+               AND filesize > 2
+               AND mimetype IS NOT NULL";
     $files = $DB->get_records_sql($sql);
     /** @var object $file */
     foreach ($files as $file) {
-        $remotefilename = $externalfilesystem->get_local_path_from_hash($file->contenthash);
-
-        echo "{$file->id} => {$file->filename} => {$remotefilename}<br>";
         $a1 = substr($file->contenthash, 0, 2);
         $a2 = substr($file->contenthash, 2, 2);
         $sourcefile = "{$CFG->dataroot}/filedir/{$a1}/{$a2}/{$file->contenthash}";
-        try {
-            $externalfilesystem->upload($sourcefile, $remotefilename, $file->mimetype, "inline; filename={$file->filename}");
-        } catch (Exception $e) {
-            // $DB->delete_records("files", ["id" => $file->id]);
-            echo $PAGE->get_renderer('core')->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
+
+        // /var/www/html/moodledata/filedir/22/32/2232d461b4fc609294c91082bb848886a4d1503c
+        if (file_exists($sourcefile)) {
+            echo "{$file->id} => {$file->filename} => {$sourcefile} - OK<br>";
+        } else {
+            echo "{$file->id} => {$file->filename} - Baixar<br>";
+
+            try {
+                $url = $externalfilesystem->get_remote_path_from_hash($file->contenthash);
+                $filecontent = file_get_contents($url);
+
+                mkdir("{$CFG->dataroot}/filedir/{$a1}");
+                mkdir("{$CFG->dataroot}/filedir/{$a1}/{$a2}");
+
+                file_put_contents($sourcefile, $filecontent);
+
+            } catch (Exception $e) {
+                echo $PAGE->get_renderer('core')->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
+            }
         }
     }
 } else {
 
     $decsep = get_string('decsep', 'langconfig');
     $thousandssep = get_string('thousandssep', 'langconfig');
-    $a = [
-        'missing' => number_format($externalfilesystem->missing_count(), 0, $decsep, $thousandssep),
-        'sending' => number_format($externalfilesystem->sending_count(), 0, $decsep, $thousandssep),
-    ];
-    echo get_string('migrate_total', 'local_alternative_file_system', $a);
     echo get_string('migrate_link', 'local_alternative_file_system');
 }
 

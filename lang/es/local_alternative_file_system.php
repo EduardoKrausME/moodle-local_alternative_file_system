@@ -51,6 +51,6 @@ $string['migrate_total'] = '<p>Tienes <strong>{$a->missing}</strong> archivos lo
 $string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Ejecutar ahora (puede tomar mucho tiempo)</a></p>';
 
 $string['instruction_title'] = 'Instrucciones de instalación';
-$string['instruction_install'] = 'Necesitas agregar el siguiente código en config.php:<pre>$CFG->alternative_file_system_class = "\local_alternative_file_system\external_file_system";</pre>';
+$string['instruction_install'] = 'Necesitas agregar el siguiente código en config.php:<pre>$CFG->alternative_file_system_class = "\\local_alternative_file_system\\external_file_system";</pre>';
 
 $string['privacy:no_data_reason'] = 'El complemento del Sistema de Archivos Alternativo no almacena ningún dato personal.';

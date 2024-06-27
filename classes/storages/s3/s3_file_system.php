@@ -125,7 +125,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
      *
      * @throws dml_exception
      */
-    public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false) {
+    public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false, $localfile = true) {
         $config = get_config("local_alternative_file_system");
 
         $cmd = $this->get_instance()->getCommand('GetObject', [
@@ -133,8 +133,20 @@ class s3_file_system extends storage_file_system implements i_file_system {
             'Key' => $this->get_local_path_from_hash($contenthash),
         ]);
 
-        $request = $this->get_instance()->createPresignedRequest($cmd, time() + 1500);
+        $request = $this->get_instance()->createPresignedRequest($cmd, time() + 604800); // 7 dias
+
         return (string)$request->getUri();
+        //if (!$localfile) {
+        //    return (string)$request->getUri();
+        //} else {
+        //    global $CFG;
+        //
+        //    $filecontent = file_get_contents((string)$request->getUri());
+        //    $target = "{$CFG->dataroot}/temp/{$contenthash}";
+        //    file_put_contents($target, $filecontent);
+        //
+        //    return $target;
+        //}
     }
 
     /**
@@ -160,19 +172,12 @@ class s3_file_system extends storage_file_system implements i_file_system {
      *
      * @return bool success
      *
-     * @throws Exception
+     * @throws dml_exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
-        $config = get_config("local_alternative_file_system");
-        $this->get_instance()->copyObject([
-            'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $target,
-            'CopySource' => $this->get_remote_path_from_storedfile($file),
-        ]);
-
-        $this->report_save($file->get_contenthash());
-
-        return true;
+        $fileurl = $this->get_remote_path_from_hash($file->get_contenthash(), false, false);
+        $filecontent = file_get_contents($fileurl);
+        return file_put_contents($target, $filecontent);
     }
 
     /**
@@ -188,13 +193,13 @@ class s3_file_system extends storage_file_system implements i_file_system {
     public function remove_file($contenthash) {
         global $DB;
 
-        $config = get_config("local_alternative_file_system");
-        $this->get_instance()->deleteObject([
-            'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $this->get_local_path_from_hash($contenthash),
-        ]);
-
-        $DB->delete_records("alternative_file_system_file", ["contenthash" => $contenthash]);
+        //$config = get_config("local_alternative_file_system");
+        //$this->get_instance()->deleteObject([
+        //    'Bucket' => $config->settings_s3_bucketname,
+        //    'Key' => $this->get_local_path_from_hash($contenthash),
+        //]);
+        //
+        //$DB->delete_records("alternative_file_system_file", ["contenthash" => $contenthash]);
 
         return true;
     }
@@ -225,3 +230,4 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $this->report_save($contenthash);
     }
 }
+

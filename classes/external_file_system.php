@@ -21,8 +21,6 @@ use Exception;
 use file_exception;
 use file_system;
 use file_system_filedir;
-use local_alternative_file_system\storages\gcs\gcs_file_system;
-use local_alternative_file_system\storages\s3\s3_file_system;
 use stored_file;
 
 defined('MOODLE_INTERNAL') || die;
@@ -39,7 +37,7 @@ require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
  */
 class external_file_system extends file_system implements i_file_system {
 
-    /** @var gcs_file_system */
+    /** @var \local_alternative_file_system\storages\s3\s3_file_system */
     private $filesysteminstance = null;
 
     /**
@@ -52,11 +50,11 @@ class external_file_system extends file_system implements i_file_system {
         $config = get_config("local_alternative_file_system");
 
         if ($config->settings_destino == 's3') {
-            $this->filesysteminstance = new s3_file_system();
+            $this->filesysteminstance = new \local_alternative_file_system\storages\s3\s3_file_system();
         } else if ($config->settings_destino == 'space') {
-            $this->filesysteminstance = new s3_file_system();
+            $this->filesysteminstance = new \local_alternative_file_system\storages\s3\s3_file_system();
         } else if ($config->settings_destino == 'gcs') {
-            $this->filesysteminstance = new gcs_file_system();
+            $this->filesysteminstance = new \local_alternative_file_system\storages\s3\gcs_file_system();
         } else {
             $this->filesysteminstance = new file_system_filedir();
         }
@@ -143,6 +141,11 @@ class external_file_system extends file_system implements i_file_system {
      * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
+//        echo '<pre>';
+//        print_r($file);
+//        print_r($target);
+//        die();
+//        echo '</pre>';
         return $this->filesysteminstance->copy_content_from_storedfile($file, $target);
     }
 
