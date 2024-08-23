@@ -70,7 +70,6 @@ if (optional_param('execute', false, PARAM_INT)) {
         try {
             $externalfilesystem->upload($sourcefile, $remotefilename, $file->mimetype, "inline; filename={$file->filename}");
         } catch (Exception $e) {
-            // $DB->delete_records("files", ["id" => $file->id]);
             echo $PAGE->get_renderer('core')->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
         }
     }

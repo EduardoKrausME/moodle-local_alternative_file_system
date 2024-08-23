@@ -147,13 +147,6 @@ class gcs_file_system extends storage_file_system implements i_file_system {
     public function remove_file($contenthash) {
         global $DB;
 
-        //$config = get_config("local_alternative_file_system");
-        //$bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
-        //$object = $bucket->object($this->get_local_path_from_hash($contenthash));
-        //$object->delete();
-        //
-        //$DB->delete_records("local_alternative_file_system_file", ["contenthash" => $contenthash]);
-
         return true;
     }
 

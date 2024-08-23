@@ -60,7 +60,6 @@ if (optional_param('execute', false, PARAM_INT)) {
         $a2 = substr($file->contenthash, 2, 2);
         $sourcefile = "{$CFG->dataroot}/filedir/{$a1}/{$a2}/{$file->contenthash}";
 
-        // /var/www/html/moodledata/filedir/22/32/2232d461b4fc609294c91082bb848886a4d1503c
         if (file_exists($sourcefile)) {
             echo "{$file->id} => {$file->filename} => {$sourcefile} - OK<br>";
         } else {
