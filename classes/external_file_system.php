@@ -141,11 +141,6 @@ class external_file_system extends file_system implements i_file_system {
      * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
-//        echo '<pre>';
-//        print_r($file);
-//        print_r($target);
-//        die();
-//        echo '</pre>';
         return $this->filesysteminstance->copy_content_from_storedfile($file, $target);
     }
 
