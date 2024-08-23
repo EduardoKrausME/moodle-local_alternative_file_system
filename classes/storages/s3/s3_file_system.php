@@ -199,7 +199,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
         //    'Key' => $this->get_local_path_from_hash($contenthash),
         //]);
         //
-        //$DB->delete_records("alternative_file_system_file", ["contenthash" => $contenthash]);
+        //$DB->delete_records("local_alternative_file_system_file", ["contenthash" => $contenthash]);
 
         return true;
     }

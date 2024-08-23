@@ -223,7 +223,7 @@ class storage_file_system extends file_system {
             "timemodifield" => time(),
         ];
         try {
-            $DB->insert_record("alternative_file_system_file", $data);
+            $DB->insert_record("local_alternative_file_system_file", $data);
             return true;
         } catch (dml_exception $e) {
             return false;
@@ -243,7 +243,7 @@ class storage_file_system extends file_system {
         $config = get_config('local_alternative_file_system');
 
         $sql = "SELECT COUNT(contenthash) AS num_files
-                  FROM {alternative_file_system_file}
+                  FROM {local_alternative_file_system_file}
                  WHERE storage = '{$config->settings_destino}'";
         $result = $DB->get_record_sql($sql);
         return $result->num_files;
@@ -265,7 +265,7 @@ class storage_file_system extends file_system {
                   FROM {files}
                  WHERE contenthash NOT IN (
                         SELECT contenthash
-                          FROM {alternative_file_system_file}
+                          FROM {local_alternative_file_system_file}
                          WHERE storage = '{$config->settings_destino}'
                      )
                    AND filename    LIKE '__%'

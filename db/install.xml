@@ -6,7 +6,7 @@
        xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
     <TABLES>
 
-        <TABLE NAME="alternative_file_system_file" COMMENT="Object data for compare files to remote">
+        <TABLE NAME="local_alternative_file_system_file" COMMENT="Object data for compare files to remote">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
