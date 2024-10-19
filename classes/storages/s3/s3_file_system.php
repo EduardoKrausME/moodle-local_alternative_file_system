@@ -180,8 +180,6 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function remove_file($contenthash) {
-        global $DB;
-
         return true;
     }
 

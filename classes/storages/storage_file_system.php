@@ -101,10 +101,10 @@ class storage_file_system extends file_system {
     public function readfile(\stored_file $file) {
         $url = $this->get_remote_path_from_hash($file->get_contenthash());
 
-        if (strpos($_SERVER['REQUEST_URI'], "pluginfile.php") >= 1) {
-            header("Location: {$url}");
-            die();
-        }
+        //if (strpos($_SERVER['REQUEST_URI'], "pluginfile.php") >= 1) {
+        //    header("Location: {$url}");
+        //    die();
+        //}
 
         if ($file->get_filesize() < 1000) {
             $success = readfile($url);
