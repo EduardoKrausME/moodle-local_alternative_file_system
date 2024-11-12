@@ -16,7 +16,6 @@
 
 namespace local_alternative_file_system\storages;
 
-use cache;
 use dml_exception;
 use Exception;
 use file_exception;

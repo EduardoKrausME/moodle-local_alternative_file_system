@@ -16,16 +16,11 @@
 
 namespace local_alternative_file_system\storages\s3;
 
-use Aws\S3\S3Client;
 use dml_exception;
 use Exception;
-use file_exception;
 use local_alternative_file_system\i_file_system;
 use local_alternative_file_system\storages\storage_file_system;
 use stored_file;
-
-defined('MOODLE_INTERNAL') || die;
-require_once(__DIR__ . "/vendor/autoload.php");
 
 /**
  * s3_file_system file.
@@ -63,22 +58,24 @@ class s3_file_system extends storage_file_system implements i_file_system {
         file_put_contents($pathname, "123");
 
         $filename = $this->get_local_path_from_hash(md5("1"));
-        $this->get_instance()->putObject([
-            'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $filename,
-            'SourceFile' => $pathname,
-            'ACL' => 'public-read',
-        ]);
-        $this->get_instance()->deleteObject([
-            'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $filename,
-        ]);
+        $this->get_instance()->putObjectFile($pathname, $config->settings_s3_bucketname, $filename, $acl = S3::ACL_PRIVATE);
+        //$this->get_instance()->putObject([
+        //    'Bucket' => $config->settings_s3_bucketname,
+        //    'Key' => $filename,
+        //    'SourceFile' => $pathname,
+        //    'ACL' => 'public-read',
+        //]);
+        $this->get_instance()->deleteObject($config->settings_s3_bucketname, $filename);
+        //$this->get_instance()->deleteObject([
+        //    'Bucket' => $config->settings_s3_bucketname,
+        //    'Key' => $filename,
+        //]);
     }
 
     /**
      * get_instance function.
      *
-     * @return S3Client
+     * @return S3
      *
      * @throws Exception
      */
@@ -88,25 +85,30 @@ class s3_file_system extends storage_file_system implements i_file_system {
             return $s3client;
         }
 
+        require_once(__DIR__ . "/S3.php");
+        require_once(__DIR__ . "/S3Request.php");
+
         $config = get_config("local_alternative_file_system");
 
         $endpoint = "";
         if ($config->settings_destino == 's3') {
-            $endpoint = "https://{$config->settings_s3_region}.s3.amazonaws.com";
+            $endpoint = "{$config->settings_s3_region}.s3.amazonaws.com";
         } else if ($config->settings_destino == 'space') {
-            $endpoint = "https://{$config->settings_s3_region}.digitaloceanspaces.com";
+            $endpoint = "{$config->settings_s3_region}.digitaloceanspaces.com";
         }
 
-        $args = [
-            'region' => $config->settings_s3_region,
-            'version' => '2006-03-01',
-            'endpoint' => $endpoint,
-            'credentials' => [
-                'key' => $config->settings_s3_credentials_key,
-                'secret' => $config->settings_s3_credentials_secret,
-            ],
-        ];
-        $s3client = new S3Client($args);
+        $s3client = new S3($config->settings_s3_credentials_key, $config->settings_s3_credentials_secret, $endpoint);
+
+        //$args = [
+        //    'region' => $config->settings_s3_region,
+        //    'version' => '2006-03-01',
+        //    'endpoint' => $endpoint,
+        //    'credentials' => [
+        //        'key' => $config->settings_s3_credentials_key,
+        //        'secret' => $config->settings_s3_credentials_secret,
+        //    ],
+        //];
+        //$s3client = new S3Client($args);
 
         return $s3client;
     }
@@ -124,18 +126,24 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @return string The full path to the content file
      *
      * @throws dml_exception
+     * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false, $localfile = true) {
         $config = get_config("local_alternative_file_system");
 
-        $cmd = $this->get_instance()->getCommand('GetObject', [
-            'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $this->get_local_path_from_hash($contenthash),
-        ]);
+        $uri = $this->get_local_path_from_hash($contenthash);
+        $lifetime = time() + 604800;
+        $url = $this->get_instance()->getAuthenticatedURL($config->settings_s3_bucketname, $uri, $lifetime, false, true);
 
-        $request = $this->get_instance()->createPresignedRequest($cmd, time() + 604800); // 7 dias
+        return $url;
 
-        return (string)$request->getUri();
+        //$cmd = $this->get_instance()->getCommand('GetObject', [
+        //    'Bucket' => $config->settings_s3_bucketname,
+        //    'Key' => $this->get_local_path_from_hash($contenthash),
+        //]);
+        //
+        //$request = $this->get_instance()->createPresignedRequest($cmd, time() + 604800); // 7 dias
+        //return (string)$request->getUri();
     }
 
     /**
@@ -157,7 +165,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * Copy content of file to given pathname.
      *
      * @param stored_file $file The file to be copied
-     * @param string $target real path to the new file
+     * @param string $target    real path to the new file
      *
      * @return bool success
      *
@@ -197,13 +205,14 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $config = get_config("local_alternative_file_system");
         $s3client = $this->get_instance();
 
-        $s3client->putObject([
-            'Bucket' => $config->settings_s3_bucketname,
-            'Key' => $filename,
-            'SourceFile' => $sourcefile,
-            'ContentType' => $contenttype,
-            'ContentDisposition' => $contentdisposition,
-        ]);
+        $s3client->putObjectFile($sourcefile, $config->settings_s3_bucketname, $filename, S3::ACL_PRIVATE);
+        //$s3client->putObject([
+        //    'Bucket' => $config->settings_s3_bucketname,
+        //    'Key' => $filename,
+        //    'SourceFile' => $sourcefile,
+        //    'ContentType' => $contenttype,
+        //    'ContentDisposition' => $contentdisposition,
+        //]);
 
         $contenthash = pathinfo($filename, PATHINFO_FILENAME);
         $this->report_save($contenthash);
