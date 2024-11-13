@@ -52,7 +52,7 @@ function xmldb_local_alternative_file_system_upgrade($oldversion) {
         }
 
         if ($dbman->table_exists("local_alternativefilesystemf")) {
-            $sql = "INSERT 
+            $sql = "INSERT
                        INTO {local_alternativefilesystemf} (contenthash, storage, timemodifield)
                      SELECT contenthash, storage, timemodifield FROM {local_alternativefilesystemf}";
             $DB->execute($sql);

@@ -17,6 +17,8 @@
 namespace local_alternative_file_system\storages\s3;
 
 /**
+ * phpcs:disable
+ *
  * S3 Request class
  *
  * @link    http://undesigned.org.za/2007/10/22/amazon-s3-php-class
