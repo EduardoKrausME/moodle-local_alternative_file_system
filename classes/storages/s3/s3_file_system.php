@@ -59,17 +59,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         $filename = $this->get_local_path_from_hash(md5("1"));
         $this->get_instance()->putObjectFile($pathname, $config->settings_s3_bucketname, $filename, $acl = S3::ACL_PRIVATE);
-        //$this->get_instance()->putObject([
-        //    'Bucket' => $config->settings_s3_bucketname,
-        //    'Key' => $filename,
-        //    'SourceFile' => $pathname,
-        //    'ACL' => 'public-read',
-        //]);
         $this->get_instance()->deleteObject($config->settings_s3_bucketname, $filename);
-        //$this->get_instance()->deleteObject([
-        //    'Bucket' => $config->settings_s3_bucketname,
-        //    'Key' => $filename,
-        //]);
     }
 
     /**
@@ -99,17 +89,6 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         $s3client = new S3($config->settings_s3_credentials_key, $config->settings_s3_credentials_secret, $endpoint);
 
-        //$args = [
-        //    'region' => $config->settings_s3_region,
-        //    'version' => '2006-03-01',
-        //    'endpoint' => $endpoint,
-        //    'credentials' => [
-        //        'key' => $config->settings_s3_credentials_key,
-        //        'secret' => $config->settings_s3_credentials_secret,
-        //    ],
-        //];
-        //$s3client = new S3Client($args);
-
         return $s3client;
     }
 
@@ -136,14 +115,6 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $url = $this->get_instance()->getAuthenticatedURL($config->settings_s3_bucketname, $uri, $lifetime, false, true);
 
         return $url;
-
-        //$cmd = $this->get_instance()->getCommand('GetObject', [
-        //    'Bucket' => $config->settings_s3_bucketname,
-        //    'Key' => $this->get_local_path_from_hash($contenthash),
-        //]);
-        //
-        //$request = $this->get_instance()->createPresignedRequest($cmd, time() + 604800); // 7 dias
-        //return (string)$request->getUri();
     }
 
     /**
@@ -206,13 +177,6 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $s3client = $this->get_instance();
 
         $s3client->putObjectFile($sourcefile, $config->settings_s3_bucketname, $filename, S3::ACL_PRIVATE);
-        //$s3client->putObject([
-        //    'Bucket' => $config->settings_s3_bucketname,
-        //    'Key' => $filename,
-        //    'SourceFile' => $sourcefile,
-        //    'ContentType' => $contenttype,
-        //    'ContentDisposition' => $contentdisposition,
-        //]);
 
         $contenthash = pathinfo($filename, PATHINFO_FILENAME);
         $this->report_save($contenthash);
