@@ -7,11 +7,4 @@
         <license>Apache-2.0</license>
         <licenseversion></licenseversion>
     </library>
-    <library>
-        <location>classes/storages/s3/vendor</location>
-        <name>aws/aws-sdk-php</name>
-        <version>3.0-dev</version>
-        <license>Apache-2.0</license>
-        <licenseversion></licenseversion>
-    </library>
 </libraries>
