@@ -16,6 +16,7 @@
 
 /**
  * version file.
+ *
  * @package    local_alternative_file_system
  * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version  = 2024110501 ;
+$plugin->version = 2024111300;
 $plugin->requires = 2017051500;
-$plugin->release = '1.2.5';
+$plugin->release = '1.2.6';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'local_alternative_file_system';
