@@ -114,6 +114,16 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $lifetime = time() + 604800;
         $url = $this->get_instance()->getAuthenticatedURL($config->settings_s3_bucketname, $uri, $lifetime, false, true);
 
+        if (strpos((new Exception())->getTraceAsString(), "mod/scorm")) {
+            if (strpos($url, "https") === 0) {
+                $unique = uniqid();
+                $tempdir = make_temp_directory('local_alternative_file_system');
+                $localfile = "{$tempdir}/{$unique}.zip";
+                file_put_contents($localfile, fopen($url, 'r'));
+                return $localfile;
+            }
+        }
+
         return $url;
     }
 
