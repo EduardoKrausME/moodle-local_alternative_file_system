@@ -61,7 +61,7 @@ function xmldb_local_alternative_file_system_upgrade($oldversion) {
             $dbman->drop_table($table);
         }
 
-        upgrade_plugin_savepoint(true, 2024110500, "local", "alternative_file_system");
+        upgrade_plugin_savepoint(true, 2024110501, "local", "alternative_file_system");
     }
 
     return true;

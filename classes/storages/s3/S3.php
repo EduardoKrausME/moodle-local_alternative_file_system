@@ -21,6 +21,9 @@ namespace local_alternative_file_system\storages\s3;
  *
  * Amazon S3 PHP class
  *
+ * @package    local_alternative_file_system
+ * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @link    http://undesigned.org.za/2007/10/22/amazon-s3-php-class
  * @version 0.5.1
  */
