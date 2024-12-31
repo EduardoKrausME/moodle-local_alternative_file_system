@@ -146,7 +146,7 @@ class storage_file_system extends file_system {
         }
 
         $hash = $file->get_contenthash();
-        $cache = cache::make('core', 'file_imageinfo');
+        $cache = \cache::make('core', 'file_imageinfo');
         $info = $cache->get($hash);
         if ($info !== false) {
             return $info;
