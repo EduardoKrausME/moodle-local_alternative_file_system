@@ -44,6 +44,9 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $this->get_instance();
 
         $config = get_config("local_alternative_file_system");
+        if(!isset($config->settings_path)){
+            return null;
+        }
 
         $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', '', $config->settings_path);
         if ($settingspath != $config->settings_path) {
@@ -79,6 +82,10 @@ class s3_file_system extends storage_file_system implements i_file_system {
         require_once(__DIR__ . "/S3Request.php");
 
         $config = get_config("local_alternative_file_system");
+
+        if(!isset($config->settings_destino)){
+            return null;
+        }
 
         $endpoint = "";
         if ($config->settings_destino == 's3') {
