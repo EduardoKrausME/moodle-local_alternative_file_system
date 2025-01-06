@@ -44,15 +44,15 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $this->get_instance();
 
         $config = get_config("local_alternative_file_system");
-        if(!isset($config->settings_path)){
+        if (!isset($config->settings_path)) {
             return null;
         }
 
-        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', '', $config->settings_path);
+        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $config->settings_path);
         if ($settingspath != $config->settings_path) {
             set_config("settings_path", $settingspath, "local_alternative_file_system");
         }
-        $settingss3region = preg_replace('/[^a-zA-Z0-9\.\-]/', '', $config->settings_s3_region);
+        $settingss3region = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $config->settings_s3_region);
         if ($settingss3region != $config->settings_s3_region) {
             set_config("settings_s3_region", $settingss3region, "local_alternative_file_system");
         }
@@ -83,7 +83,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         $config = get_config("local_alternative_file_system");
 
-        if(!isset($config->settings_destino)){
+        if (!isset($config->settings_destino)) {
             return null;
         }
 
