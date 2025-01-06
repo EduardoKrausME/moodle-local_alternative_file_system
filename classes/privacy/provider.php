@@ -32,6 +32,6 @@ class provider implements null_provider {
      * @return  string
      */
     public static function get_reason(): string {
-        return 'privacy:no_data_reason';
+        return "privacy:no_data_reason";
     }
 }

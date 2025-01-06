@@ -49,11 +49,11 @@ class external_file_system extends file_system implements i_file_system {
     public function __construct() {
         $config = get_config("local_alternative_file_system");
 
-        if ($config->settings_destino == 's3') {
+        if ($config->settings_destino == "s3") {
             $this->filesysteminstance = new \local_alternative_file_system\storages\s3\s3_file_system();
-        } else if ($config->settings_destino == 'space') {
+        } else if ($config->settings_destino == "space") {
             $this->filesysteminstance = new \local_alternative_file_system\storages\s3\s3_file_system();
-        } else if ($config->settings_destino == 'gcs') {
+        } else if ($config->settings_destino == "gcs") {
             $this->filesysteminstance = new \local_alternative_file_system\storages\s3\gcs_file_system();
         } else {
             $this->filesysteminstance = new file_system_filedir();

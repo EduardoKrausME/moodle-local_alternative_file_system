@@ -26,23 +26,23 @@ use local_alternative_file_system\external_file_system;
 
 define('OPEN_INTERNAL', true);
 
-require_once('../../config.php');
+require_once("../../config.php");
 
 require_login();
-require_capability('moodle/site:config', context_system::instance());
+require_capability("moodle/site:config", context_system::instance());
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagetype('my-index');
-$PAGE->set_url(new moodle_url('/local/alternative_file_system/move-to-external.php'));
-$PAGE->set_title(get_string('migrate_title', 'local_alternative_file_system'));
-$PAGE->set_heading(get_string('migrate_title', 'local_alternative_file_system'));
+$PAGE->set_pagetype("my-index");
+$PAGE->set_url(new moodle_url("/local/alternative_file_system/move-to-external.php"));
+$PAGE->set_title(get_string("migrate_title", "local_alternative_file_system"));
+$PAGE->set_heading(get_string("migrate_title", "local_alternative_file_system"));
 
 echo $OUTPUT->header();
 
-$config = get_config('local_alternative_file_system');
+$config = get_config("local_alternative_file_system");
 $externalfilesystem = new external_file_system();
 
-if (optional_param('execute', false, PARAM_INT)) {
+if (optional_param("execute", false, PARAM_INT)) {
 
     session_write_close();
     set_time_limit(0);
@@ -58,10 +58,10 @@ if (optional_param('execute', false, PARAM_INT)) {
     foreach ($files as $file) {
         $a1 = substr($file->contenthash, 0, 2);
         $a2 = substr($file->contenthash, 2, 2);
-        $sourcefile = "{$CFG->dataroot}/filedir/{$a1}/{$a2}/{$file->contenthash}";
+        $localfile = "{$CFG->dataroot}/filedir/{$a1}/{$a2}/{$file->contenthash}";
 
-        if (file_exists($sourcefile)) {
-            echo "{$file->id} => {$file->filename} => {$sourcefile} - OK<br>";
+        if (file_exists($localfile)) {
+            echo "{$file->id} => {$file->filename} => {$localfile} - OK<br>";
         } else {
             echo "{$file->id} => {$file->filename} - Baixar<br>";
 
@@ -72,18 +72,17 @@ if (optional_param('execute', false, PARAM_INT)) {
                 mkdir("{$CFG->dataroot}/filedir/{$a1}");
                 mkdir("{$CFG->dataroot}/filedir/{$a1}/{$a2}");
 
-                file_put_contents($sourcefile, $filecontent);
+                file_put_contents($localfile, $filecontent);
 
             } catch (Exception $e) {
-                echo $PAGE->get_renderer('core')->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
+                echo $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
             }
         }
     }
 } else {
-
-    $decsep = get_string('decsep', 'langconfig');
-    $thousandssep = get_string('thousandssep', 'langconfig');
-    echo get_string('migrate_link', 'local_alternative_file_system');
+    $decsep = get_string("decsep", "langconfig");
+    $thousandssep = get_string("thousandssep", "langconfig");
+    echo get_string("migrate_link", "local_alternative_file_system");
 }
 
 echo $OUTPUT->footer();

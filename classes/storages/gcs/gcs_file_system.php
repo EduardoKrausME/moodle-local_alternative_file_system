@@ -51,7 +51,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
         $config = get_config("local_alternative_file_system");
 
         $storage = new StorageClient([
-            'keyFile' => json_decode($config->settings_gcs_keyfile, true),
+            "keyFile" => json_decode($config->settings_gcs_keyfile, true),
         ]);
 
         return $storage;
@@ -69,7 +69,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
 
         $config = get_config("local_alternative_file_system");
 
-        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', '', $config->settings_path);
+        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $config->settings_path);
         if ($settingspath != $config->settings_path) {
             set_config("settings_path", $settingspath, "local_alternative_file_system");
         }
@@ -79,8 +79,8 @@ class gcs_file_system extends storage_file_system implements i_file_system {
 
         $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
         $filename = $this->get_local_path_from_hash(md5("1"));
-        $stream = fopen($pathname, 'r');
-        $options = ['name' => $filename];
+        $stream = fopen($pathname, "r");
+        $options = ["name" => $filename];
         $bucket->upload($stream, $options);
 
         $object = $bucket->object($filename);
@@ -164,12 +164,12 @@ class gcs_file_system extends storage_file_system implements i_file_system {
         $config = get_config("local_alternative_file_system");
 
         $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
-        $stream = fopen($sourcefile, 'r');
+        $stream = fopen($sourcefile, "r");
         $options = [
-            'name' => $filename,
-            'metadata' => [
-                'contentType' => $contenttype,
-                'contentDisposition' => $contentdisposition,
+            "name" => $filename,
+            "metadata" => [
+                "contentType" => $contenttype,
+                "contentDisposition" => $contentdisposition,
             ],
         ];
         $bucket->upload($stream, $options);

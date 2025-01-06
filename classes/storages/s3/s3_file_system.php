@@ -88,9 +88,9 @@ class s3_file_system extends storage_file_system implements i_file_system {
         }
 
         $endpoint = "";
-        if ($config->settings_destino == 's3') {
+        if ($config->settings_destino == "s3") {
             $endpoint = "{$config->settings_s3_region}.s3.amazonaws.com";
-        } else if ($config->settings_destino == 'space') {
+        } else if ($config->settings_destino == "space") {
             $endpoint = "{$config->settings_s3_region}.digitaloceanspaces.com";
         }
 
@@ -124,9 +124,9 @@ class s3_file_system extends storage_file_system implements i_file_system {
         if (strpos((new Exception())->getTraceAsString(), "mod/scorm")) {
             if (strpos($url, "https") === 0) {
                 $unique = uniqid();
-                $tempdir = make_temp_directory('local_alternative_file_system');
+                $tempdir = make_temp_directory("local_alternative_file_system");
                 $localfile = "{$tempdir}/{$unique}.zip";
-                file_put_contents($localfile, fopen($url, 'r'));
+                file_put_contents($localfile, fopen($url, "r"));
                 return $localfile;
             }
         }

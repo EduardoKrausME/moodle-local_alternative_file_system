@@ -26,23 +26,23 @@ use local_alternative_file_system\external_file_system;
 
 define('OPEN_INTERNAL', true);
 
-require_once('../../config.php');
+require_once("../../config.php");
 
 require_login();
-require_capability('moodle/site:config', context_system::instance());
+require_capability("moodle/site:config", context_system::instance());
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_pagetype('my-index');
-$PAGE->set_url(new moodle_url('/local/alternative_file_system/move-to-external.php'));
-$PAGE->set_title(get_string('migrate_title', 'local_alternative_file_system'));
-$PAGE->set_heading(get_string('migrate_title', 'local_alternative_file_system'));
+$PAGE->set_pagetype("my-index");
+$PAGE->set_url(new moodle_url("/local/alternative_file_system/move-to-external.php"));
+$PAGE->set_title(get_string("migrate_title", "local_alternative_file_system"));
+$PAGE->set_heading(get_string("migrate_title", "local_alternative_file_system"));
 
 echo $OUTPUT->header();
 
-$config = get_config('local_alternative_file_system');
+$config = get_config("local_alternative_file_system");
 $externalfilesystem = new external_file_system();
 
-if (optional_param('execute', false, PARAM_INT)) {
+if (optional_param("execute", false, PARAM_INT)) {
 
     session_write_close();
     set_time_limit(0);
@@ -70,19 +70,19 @@ if (optional_param('execute', false, PARAM_INT)) {
         try {
             $externalfilesystem->upload($sourcefile, $remotefilename, $file->mimetype, "inline; filename={$file->filename}");
         } catch (Exception $e) {
-            echo $PAGE->get_renderer('core')->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
+            echo $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
         }
     }
 } else {
 
-    $decsep = get_string('decsep', 'langconfig');
-    $thousandssep = get_string('thousandssep', 'langconfig');
+    $decsep = get_string("decsep", "langconfig");
+    $thousandssep = get_string("thousandssep", "langconfig");
     $a = [
-        'missing' => number_format($externalfilesystem->missing_count(), 0, $decsep, $thousandssep),
-        'sending' => number_format($externalfilesystem->sending_count(), 0, $decsep, $thousandssep),
+        "missing" => number_format($externalfilesystem->missing_count(), 0, $decsep, $thousandssep),
+        "sending" => number_format($externalfilesystem->sending_count(), 0, $decsep, $thousandssep),
     ];
-    echo get_string('migrate_total', 'local_alternative_file_system', $a);
-    echo get_string('migrate_link', 'local_alternative_file_system');
+    echo get_string("migrate_total", "local_alternative_file_system", $a);
+    echo get_string("migrate_link", "local_alternative_file_system");
 }
 
 echo $OUTPUT->footer();

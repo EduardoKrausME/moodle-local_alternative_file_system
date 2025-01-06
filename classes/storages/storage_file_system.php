@@ -76,7 +76,7 @@ class storage_file_system extends file_system {
         $contenthash = sha1($content);
         $filesize = strlen($content);
 
-        if ($content === '') {
+        if ($content === "") {
             return [$contenthash, $filesize, false];
         }
 
@@ -107,7 +107,7 @@ class storage_file_system extends file_system {
         }
 
         if (!$success) {
-            throw new file_exception('storedfilecannotreadfile', $file->get_filename());
+            throw new file_exception("storedfilecannotreadfile", $file->get_filename());
         }
     }
 
@@ -146,7 +146,7 @@ class storage_file_system extends file_system {
         }
 
         $hash = $file->get_contenthash();
-        $cache = \cache::make('core', 'file_imageinfo');
+        $cache = \cache::make("core", "file_imageinfo");
         $info = $cache->get($hash);
         if ($info !== false) {
             return $info;
@@ -209,7 +209,7 @@ class storage_file_system extends file_system {
     public function report_save($contenthash) {
         global $DB;
 
-        $config = get_config('local_alternative_file_system');
+        $config = get_config("local_alternative_file_system");
 
         $data = [
             "contenthash" => $contenthash,
@@ -234,7 +234,7 @@ class storage_file_system extends file_system {
     public function sending_count() {
         global $DB;
 
-        $config = get_config('local_alternative_file_system');
+        $config = get_config("local_alternative_file_system");
 
         $sql = "SELECT COUNT(contenthash) AS num_files
                   FROM {local_alternativefilesystemf}
@@ -253,7 +253,7 @@ class storage_file_system extends file_system {
     public function missing_count() {
         global $DB;
 
-        $config = get_config('local_alternative_file_system');
+        $config = get_config("local_alternative_file_system");
 
         $sql = "SELECT COUNT(*) AS num_files
                   FROM {files}
@@ -283,26 +283,26 @@ class storage_file_system extends file_system {
      */
     public function add_file_from_path($pathname, $contenthash = null) {
         if (!is_readable($pathname)) {
-            throw new file_exception('storedfilecannotread', '', $pathname);
+            throw new file_exception("storedfilecannotread", "", $pathname);
         }
 
         $filesize = filesize($pathname);
         if ($filesize === false) {
-            throw new file_exception('storedfilecannotread', '', $pathname);
+            throw new file_exception("storedfilecannotread", "", $pathname);
         }
         if (is_null($contenthash)) {
             $contenthash = sha1_file($pathname);
         }
         if (is_null($contenthash)) {
-            throw new file_exception('storedfilecannotread', '', $pathname);
+            throw new file_exception("storedfilecannotread", "", $pathname);
         }
 
-        $contenttype = 'binary/octet-stream';
+        $contenttype = "binary/octet-stream";
         $contentdisposition = "attachment";
         foreach ($_FILES as $file) {
-            if ($file['tmp_name'] == $pathname) {
-                $contentdisposition = "inline; filename={$file['name']}";
-                $contenttype = $file['type'];
+            if ($file["tmp_name"] == $pathname) {
+                $contentdisposition = "inline; filename={$file["name"]}";
+                $contenttype = $file["type"];
             }
         }
 
