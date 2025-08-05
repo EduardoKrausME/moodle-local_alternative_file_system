@@ -89,7 +89,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         $endpoint = "";
         if ($config->settings_destino == "s3") {
-            $endpoint = "{$config->settings_s3_region}.s3.amazonaws.com";
+            $endpoint = "{$config->settings_s3_bucketname}.s3.{$config->settings_s3_region}.amazonaws.com";
         } else if ($config->settings_destino == "space") {
             $endpoint = "{$config->settings_s3_region}.digitaloceanspaces.com";
         }
