@@ -16,9 +16,7 @@
 
 namespace local_alternative_file_system;
 
-use dml_exception;
 use Exception;
-use file_exception;
 use file_system;
 use file_system_filedir;
 use stored_file;
@@ -43,8 +41,7 @@ class external_file_system extends file_system implements i_file_system {
     /**
      * external_file_system constructor.
      *
-     * @throws dml_exception
-     * @throws file_exception
+     * @throws Exception
      */
     public function __construct() {
         $config = get_config("local_alternative_file_system");
@@ -63,8 +60,6 @@ class external_file_system extends file_system implements i_file_system {
     /**
      * Test config function.
      *
-     * @throws dml_exception
-     *
      * @throws Exception
      */
     public function test_config() {
@@ -76,10 +71,8 @@ class external_file_system extends file_system implements i_file_system {
      *
      * @param string $contenthash
      * @param bool $fetchifnotfound
-     *
      * @return string
-     *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function get_local_path_from_hash($contenthash, $fetchifnotfound = false) {
         return $this->filesysteminstance->get_local_path_from_hash($contenthash, $fetchifnotfound);
@@ -94,10 +87,8 @@ class external_file_system extends file_system implements i_file_system {
      *
      * @param string $contenthash
      * @param bool $fetchifnotfound
-     *
      * @return string The full path to the content file
-     *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false) {
         return $this->filesysteminstance->get_remote_path_from_hash($contenthash);
@@ -108,9 +99,7 @@ class external_file_system extends file_system implements i_file_system {
      *
      * @param stored_file $file
      * @param bool $fetchifnotfound
-     *
      * @return string
-     *
      * @throws Exception
      */
     public function get_local_path_from_storedfile(stored_file $file, $fetchifnotfound = false) {
@@ -121,9 +110,7 @@ class external_file_system extends file_system implements i_file_system {
      * get_remote_file_size function.
      *
      * @param string $contenthash
-     *
      * @return int
-     *
      * @throws Exception
      */
     public function get_remote_file_size($contenthash) {
@@ -135,9 +122,7 @@ class external_file_system extends file_system implements i_file_system {
      *
      * @param stored_file $file The file to be copied
      * @param string $target real path to the new file
-     *
      * @return bool success
-     *
      * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
@@ -148,10 +133,7 @@ class external_file_system extends file_system implements i_file_system {
      * Removes the file.
      *
      * @param string $contenthash
-     *
      * @return bool
-     *
-     * @throws dml_exception
      * @throws Exception
      */
     public function remove_file($contenthash) {
@@ -163,11 +145,7 @@ class external_file_system extends file_system implements i_file_system {
      *
      * @param string $pathname Path to file currently on disk
      * @param string $contenthash SHA1 hash of content if known (performance only)
-     *
      * @return array (contenthash, filesize, newfile)
-     *
-     * @throws file_exception
-     * @throws dml_exception
      * @throws Exception
      */
     public function add_file_from_path($pathname, $contenthash = null) {
@@ -181,7 +159,6 @@ class external_file_system extends file_system implements i_file_system {
      * @param string $filename
      * @param string $contenttype
      * @param string $contentdisposition
-     *
      * @throws Exception
      */
     public function upload($sourcefile, $filename, $contenttype, $contentdisposition) {
@@ -192,11 +169,8 @@ class external_file_system extends file_system implements i_file_system {
      * Add string content to sha1 pool.
      *
      * @param string $content file content - binary string
-     *
      * @return array (contenthash, filesize, newfile)
-     *
-     * @throws file_exception
-     * @throws dml_exception
+     * @throws Exception
      */
     public function add_file_from_string($content) {
         return $this->filesysteminstance->add_file_from_string($content);
@@ -206,8 +180,6 @@ class external_file_system extends file_system implements i_file_system {
      * readfile function.
      *
      * @param stored_file $file
-     *
-     * @throws file_exception
      * @throws Exception
      */
     public function readfile(stored_file $file) {
@@ -218,9 +190,7 @@ class external_file_system extends file_system implements i_file_system {
      * Determine whether the file is present on the local file system somewhere.
      *
      * @param stored_file $file The file to ensure is available.
-     *
      * @return bool
-     *
      * @throws Exception
      */
     public function is_file_readable_remotely_by_storedfile(stored_file $file) {
@@ -232,10 +202,7 @@ class external_file_system extends file_system implements i_file_system {
      * Information is determined from the file content
      *
      * @param stored_file $file The file to inspect
-     *
      * @return mixed array with width, height and mimetype; false if not an image
-     *
-     * @throws \coding_exception
      * @throws Exception
      */
     public function get_imageinfo(stored_file $file) {
@@ -244,10 +211,8 @@ class external_file_system extends file_system implements i_file_system {
 
     /**
      * Sending count function.
-     *
      * @return int
-     *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function sending_count() {
         return $this->filesysteminstance->sending_count();
@@ -257,8 +222,7 @@ class external_file_system extends file_system implements i_file_system {
      * Missing count function.
      *
      * @return int
-     *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function missing_count() {
         return $this->filesysteminstance->missing_count();

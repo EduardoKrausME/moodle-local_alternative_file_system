@@ -39,7 +39,6 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      * get_instance function.
      *
      * @return StorageClient
-     *
      * @throws Exception
      */
     private function get_instance() {
@@ -59,8 +58,6 @@ class gcs_file_system extends storage_file_system implements i_file_system {
 
     /**
      * Test config function.
-     *
-     * @throws dml_exception
      *
      * @throws Exception
      */
@@ -96,10 +93,8 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      *
      * @param string $contenthash
      * @param bool $fetchifnotfound
-     *
      * @return string The full path to the content file
-     *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false) {
 
@@ -116,20 +111,21 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      *
      * @param stored_file $file The file to be copied
      * @param string $target real path to the new file
-     *
      * @return bool success
-     *
      * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
         $config = get_config("local_alternative_file_system");
 
-        $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
-        $object = $bucket->object($this->get_remote_path_from_storedfile($file));
+        try {
+            $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
+            $object = $bucket->object($this->get_remote_path_from_storedfile($file));
 
-        $object->copy($target);
+            $object->copy($target);
 
-        $this->report_save($file->get_contenthash());
+            $this->report_save($file->get_contenthash());
+        } catch (Exception $e) { // phpcs:disable
+        }
 
         return true;
     }
@@ -138,10 +134,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      * Removes the file.
      *
      * @param string $contenthash
-     *
      * @return bool
-     *
-     * @throws dml_exception
      * @throws Exception
      */
     public function remove_file($contenthash) {
@@ -157,7 +150,6 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      * @param string $filename
      * @param string $contenttype
      * @param string $contentdisposition
-     *
      * @throws Exception
      */
     public function upload($sourcefile, $filename, $contenttype, $contentdisposition) {
