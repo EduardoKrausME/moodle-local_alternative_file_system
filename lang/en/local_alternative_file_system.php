@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['instruction_install'] = 'You need to add the code below to config.php:<pre>$CFG->alternative_file_system_class = "\\local_alternative_file_system\\external_file_system";</pre>';
+$string['instruction_install'] = '<p><strong>Add the line below to the Moodle <code>config.php</code> file:</strong></p><pre><code>$CFG->alternative_file_system_class = \'\local_alternative_file_system\external_file_system\';</code></pre><p><strong>Important:</strong> Insert this line <strong>before</strong> the following line, if it exists in your file:</p><pre><code>require_once(__DIR__ . \'/lib/setup.php\');</code></pre>';
 $string['instruction_title'] = 'Installation Instructions';
 
 $string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Execute Now (may take a long time)</a></p>';
