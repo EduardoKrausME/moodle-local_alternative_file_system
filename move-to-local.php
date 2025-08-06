@@ -29,6 +29,9 @@ define('OPEN_INTERNAL', true);
 require_once("../../config.php");
 
 ignore_user_abort(true);
+set_time_limit(0); // Executa indefinidamente.
+ini_set('max_execution_time', 0); // Alternativa.
+
 require_login();
 require_capability("moodle/site:config", context_system::instance());
 
