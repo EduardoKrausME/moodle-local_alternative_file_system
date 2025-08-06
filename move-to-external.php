@@ -28,6 +28,7 @@ define('OPEN_INTERNAL', true);
 
 require_once("../../config.php");
 
+ignore_user_abort(true);
 require_login();
 require_capability("moodle/site:config", context_system::instance());
 
