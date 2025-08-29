@@ -30,7 +30,7 @@ require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
  * external_file_system file.
  *
  * @package    local_alternative_file_system
- * @copyright  2024 Eduardo Kraus {@link http://eduardokraus.com}
+ * @copyright  2024 Eduardo Kraus {@link https://eduardokraus.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class external_file_system extends file_system implements i_file_system {
