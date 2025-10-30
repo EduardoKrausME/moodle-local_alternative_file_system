@@ -199,4 +199,3 @@ class s3_file_system extends storage_file_system implements i_file_system {
         $this->report_save($contenthash);
     }
 }
-

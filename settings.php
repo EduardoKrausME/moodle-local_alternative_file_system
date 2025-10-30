@@ -94,7 +94,7 @@ if ($hassiteconfig) {
                         "missing" => number_format($s3filesystem->missing_count(), 0, $decsep, $thousandssep),
                         "sending" => number_format($s3filesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
-                    $string1 = get_string("migrate_total", "local_alternative_file_system", $a);;
+                    $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
                     $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_SUCCESS, false)));
                     $settings->add($setting);
@@ -169,7 +169,7 @@ if ($hassiteconfig) {
                         "missing" => number_format($gcsfilesystem->missing_count(), 0, $decsep, $thousandssep),
                         "sending" => number_format($gcsfilesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
-                    $string1 = get_string("migrate_total", "local_alternative_file_system", $a);;
+                    $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
                     $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_SUCCESS, false)));
                     $settings->add($setting);
