@@ -68,7 +68,7 @@ final class S3Request {
      * @var array
      * @access private
      */
-    private $parameters = array();
+    private $parameters = [];
 
     /**
      * Amazon specific request headers
@@ -76,7 +76,7 @@ final class S3Request {
      * @var array
      * @access private
      */
-    private $amzHeaders = array();
+    private $amzHeaders = [];
 
     /**
      * HTTP request headers
@@ -161,7 +161,7 @@ final class S3Request {
         $this->response = new \stdClass();
         $this->response->error = false;
         $this->response->body = null;
-        $this->response->headers = array();
+        $this->response->headers = [];
     }
 
     /**
@@ -251,8 +251,8 @@ final class S3Request {
         }
 
         // Headers
-        $headers = array();
-        $amz = array();
+        $headers = [];
+        $amz = [];
         foreach ($this->amzHeaders as $header => $value)
             if (strlen($value) > 0) $headers[] = $header . ': ' . $value;
         foreach ($this->headers as $header => $value)
