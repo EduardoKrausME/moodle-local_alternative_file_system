@@ -18,7 +18,7 @@
  * Scheduled task to move files from tool_objectfs (DigitalOcean Spaces) to local_alternative_file_system destination.
  *
  * While Moodle is using tool_objectfs as $CFG->alternative_file_system_class, this task copies objects to the
- * destination configured in local_alternative_file_system (s3/space/gcs). When finished, you can switch
+ * destination configured in local_alternative_file_system (s3/space). When finished, you can switch
  * $CFG->alternative_file_system_class to \local_alternative_file_system\external_file_system.
  *
  * @package    local_alternative_file_system
@@ -27,8 +27,6 @@
  */
 
 namespace local_alternative_file_system\task;
-
-defined('MOODLE_INTERNAL') || die();
 
 use core\task\scheduled_task;
 use core\output\notification;
@@ -82,23 +80,23 @@ class move_from_objectfs extends scheduled_task {
 
         $errors = [];
 
-        // --- Execute ---
+        // Execute.
         session_write_close();
         set_time_limit(0);
         @ob_end_flush();
 
         if (empty($destconfig->settings_destino) || $destconfig->settings_destino === "local") {
             $error = $PAGE->get_renderer("core")->render(
-                new notification("Destino inválido. Configure o local_alternative_file_system para um destino remoto (s3/space/gcs).", notification::NOTIFY_ERROR)
+                new notification("Invalid destination. Configure the local_alternative_file_system to a remote destination (s3/space).", notification::NOTIFY_ERROR)
             );
             mtrace($error);
             return;
         }
 
         if ($dokey === "" || $dosecret === "" || $doregion === "" || $dospace === "") {
-            $error= $PAGE->get_renderer("core")->render(
+            $error = $PAGE->get_renderer("core")->render(
                 new notification(
-                    "Config incompleta no tool_objectfs (necessário: do_key, do_secret, do_region e do_space).",
+                    "Incomplete configuration in tool_objectfs (required: do_key, do_secret, do_region, and do_space).",
                     notification::NOTIFY_ERROR
                 )
             );
@@ -109,13 +107,7 @@ class move_from_objectfs extends scheduled_task {
         require_once(__DIR__ . "/classes/storages/s3/S3.php");
         require_once(__DIR__ . "/classes/storages/s3/S3Request.php");
 
-        /**
-         * Build the remote object key in object storage from a contenthash.
-         *
-         * @param string $contenthash
-         * @param string $prefix
-         * @return string
-         */
+        // Build the remote object key in object storage from a contenthash.
         $buildobjectkey = static function(string $contenthash, string $prefix): string {
             $a1 = substr($contenthash, 0, 2);
             $a2 = substr($contenthash, 2, 2);
