@@ -19,6 +19,8 @@ namespace local_alternative_file_system;
 use Exception;
 use file_system;
 use file_system_filedir;
+use local_alternative_file_system\storages\gcs\gcs_file_system;
+use local_alternative_file_system\storages\s3\s3_file_system;
 use stored_file;
 
 defined('MOODLE_INTERNAL') || die;
@@ -35,7 +37,7 @@ require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
  */
 class external_file_system extends file_system implements i_file_system {
 
-    /** @var \local_alternative_file_system\storages\s3\s3_file_system */
+    /** @var s3_file_system */
     private $filesysteminstance = null;
 
     /**
@@ -46,12 +48,10 @@ class external_file_system extends file_system implements i_file_system {
     public function __construct() {
         $config = get_config("local_alternative_file_system");
 
-        if ($config->settings_destino == "s3") {
-            $this->filesysteminstance = new \local_alternative_file_system\storages\s3\s3_file_system();
-        } else if ($config->settings_destino == "space") {
-            $this->filesysteminstance = new \local_alternative_file_system\storages\s3\s3_file_system();
+        if ($config->settings_destino == "s3" || $config->settings_destino == "space") {
+            $this->filesysteminstance = new s3_file_system();
         } else if ($config->settings_destino == "gcs") {
-            $this->filesysteminstance = new \local_alternative_file_system\storages\gcs\gcs_file_system();
+            $this->filesysteminstance = new gcs_file_system();
         } else {
             $this->filesysteminstance = new file_system_filedir();
         }
