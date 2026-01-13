@@ -47,7 +47,6 @@ $config = get_config("local_alternative_file_system");
 $externalfilesystem = new external_file_system();
 
 if (optional_param("execute", false, PARAM_INT)) {
-
     session_write_close();
     set_time_limit(0);
     ob_end_flush();
@@ -62,7 +61,7 @@ if (optional_param("execute", false, PARAM_INT)) {
                AND filename    LIKE '__%'
                AND filesize    > 2
                AND mimetype    IS NOT NULL";
-    $files = $DB->get_records_sql($sql);
+    $files = $DB->get_recordset_sql($sql);
     /** @var object $file */
     foreach ($files as $file) {
         $remotefilename = $externalfilesystem->get_local_path_from_hash($file->contenthash);
@@ -77,6 +76,7 @@ if (optional_param("execute", false, PARAM_INT)) {
             echo $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
         }
     }
+    $files->close();
 } else {
 
     $decsep = get_string("decsep", "langconfig");

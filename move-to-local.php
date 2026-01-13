@@ -57,7 +57,7 @@ if (optional_param("execute", false, PARAM_INT)) {
              WHERE filename LIKE '__%'
                AND filesize > 2
                AND mimetype IS NOT NULL";
-    $files = $DB->get_records_sql($sql);
+    $files = $DB->get_recordset_sql($sql);
     /** @var object $file */
     foreach ($files as $file) {
         $a1 = substr($file->contenthash, 0, 2);
@@ -83,6 +83,7 @@ if (optional_param("execute", false, PARAM_INT)) {
             }
         }
     }
+    $files->close();
 } else {
     $decsep = get_string("decsep", "langconfig");
     $thousandssep = get_string("thousandssep", "langconfig");
