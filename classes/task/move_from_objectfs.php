@@ -116,7 +116,7 @@ class move_from_objectfs extends scheduled_task {
          * @param string $prefix
          * @return string
          */
-        $buildobjectkey = static function(string $contenthash, string $prefix) : string {
+        $buildobjectkey = static function(string $contenthash, string $prefix): string {
             $a1 = substr($contenthash, 0, 2);
             $a2 = substr($contenthash, 2, 2);
             return $prefix . "{$a1}/{$a2}/{$contenthash}";
