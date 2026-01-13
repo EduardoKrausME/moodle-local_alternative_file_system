@@ -20,6 +20,7 @@ use Exception;
 use local_alternative_file_system\i_file_system;
 use local_alternative_file_system\storages\storage_file_system;
 use stored_file;
+use Throwable;
 
 /**
  * s3_file_system file.
@@ -182,7 +183,8 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         try {
             S3::deleteObject($config->settings_s3_bucketname, $uri);
-        } catch (\Throwable $e) { // phpcs:disable Squiz.Commenting.EmptyCatchComment.Missing
+        } catch (Throwable $e) {
+            return false;
         }
 
         // Remove tracking row only for this storage.
