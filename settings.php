@@ -35,17 +35,37 @@ if ($hassiteconfig) {
     $decsep = get_string("decsep", "langconfig");
     $thousandssep = get_string("thousandssep", "langconfig");
 
+    $config = get_config("local_alternative_file_system");
     $settings = new admin_settingpage("local_alternative_file_system", get_string("pluginname", "local_alternative_file_system"));
 
     $ADMIN->add("localplugins", $settings);
+
+    if (!empty($CFG->alternative_file_system_class) && strpos($CFG->alternative_file_system_class, '\\tool_objectfs\\') !== false) {
+        $reporturl = new moodle_url('/local/alternative_file_system/report-migrate.php');
+        $reportlink = html_writer::link($reporturl, 'report-migrate.php');
+        $a = (object)[
+            'currentclass' => s($CFG->alternative_file_system_class),
+            'reportlink' => $reportlink,
+        ];
+        $msg = get_string('settings_objectfs_notice', 'local_alternative_file_system', $a);
+
+        $settings->add(new admin_setting_heading(
+            'local_alternative_file_system/objectfs_notice',
+            '',
+            $PAGE->get_renderer('core')->render(new notification($msg, notification::NOTIFY_INFO, false))
+        ));
+    }
 
     if (!empty($CFG->alternative_file_system_class)) {
         $settingsdestinos = [
             "" => get_string("settings_local", "local_alternative_file_system"),
             "s3" => "Amazon S3",
             "space" => "Digital Ocean Space",
-            "gcs" => "Google Cloud Storage",
         ];
+        if ($config->settings_destino == "gcs") {
+            $settingsdestinos[] = ["gcs" => "Google Cloud Storage"];
+        }
+
         $settings->add(new admin_setting_configselect(
             "local_alternative_file_system/settings_destino",
             get_string("settings_destino", "local_alternative_file_system"),
@@ -54,8 +74,6 @@ if ($hassiteconfig) {
             $settingsdestinos
         ));
         $PAGE->requires->js_call_amd("local_alternative_file_system/settings", "init");
-
-        $config = get_config("local_alternative_file_system");
 
         $datalang = [
             "url" => "{$CFG->wwwroot}/local/alternative_file_system/move-to-external.php",
