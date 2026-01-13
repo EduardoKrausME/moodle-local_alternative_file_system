@@ -29,6 +29,6 @@ $definitions = [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'simpledata' => true,
-        'ttl' => 1800, // 30 minutes cache
+        'ttl' => 1800, // 30 minutes cache.
     ],
 ];
