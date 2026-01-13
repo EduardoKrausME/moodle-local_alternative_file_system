@@ -41,6 +41,8 @@ use RuntimeException;
 class move_from_objectfs extends scheduled_task {
 
     /**
+     * get_name
+     *
      * @return string
      * @throws Exception
      */
@@ -56,6 +58,11 @@ class move_from_objectfs extends scheduled_task {
      */
     public function execute(): void {
         global $PAGE, $DB, $CFG;
+
+        if (empty($CFG->alternative_file_system_class) ||
+            strpos($CFG->alternative_file_system_class, 'tool_objectfs') === false) {
+            return;
+        }
 
         $destconfig = get_config("local_alternative_file_system");
 
