@@ -42,6 +42,7 @@ class move_from_objectfs extends scheduled_task {
 
     /**
      * @return string
+     * @throws Exception
      */
     public function get_name(): string {
         return get_string('task_movefromobjectfs', 'local_alternative_file_system');
@@ -51,6 +52,7 @@ class move_from_objectfs extends scheduled_task {
      * Execute task.
      *
      * @return void
+     * @throws Exception
      */
     public function execute(): void {
         global $PAGE, $DB, $CFG;
