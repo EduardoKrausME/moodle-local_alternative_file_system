@@ -2,7 +2,7 @@
 
 This plugin enables the transfer of all files from the directory **moodledata/filedir** to the cloud.
 
-With this plugin, it's possible to transfer files to **AWS S3**, **DigitalOcean Spaces**, or **Google Cloud Storage**.
+With this plugin, it's possible to transfer files to **AWS S3** or **DigitalOcean Spaces**.
 
 ## Advantages of Cloud Files over Local in Moodle
 
@@ -63,14 +63,3 @@ To complete the plugin installation and move your objects to the cloud, you shou
     - Choose a unique name for your space and select the region where you want it to be hosted.
 4. **Generate an access token**:
     - Go to "API" in the DigitalOcean Console and generate a new access token with appropriate permissions to access your space.
-
-### Google Cloud Storage
-1. **Create a Google Cloud Platform (GCP) account**:
-    - If you don't already have one, create a GCP account at [cloud.google.com](https://cloud.google.com/).
-2. **Access the GCP Console**:
-    - Log in to the GCP Console.
-3. **Create a new bucket in Google Cloud Storage**:
-    - In the console, go to Google Cloud Storage and create a new bucket.
-    - Choose a unique name for your bucket and select the region where you want it to be hosted.
-4. **Configure access permissions**:
-    - Make sure to configure appropriate access policies for your bucket so it can be accessed by Moodle.
