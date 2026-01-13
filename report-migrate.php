@@ -334,8 +334,8 @@ foreach ($storages as $s) {
 
     echo html_writer::end_div();
 
-    echo html_writer::end_div(); // card-body
-    echo html_writer::end_div(); // card
+    echo html_writer::end_div(); // card-body.
+    echo html_writer::end_div(); // card.
 }
 
 echo $OUTPUT->footer();
