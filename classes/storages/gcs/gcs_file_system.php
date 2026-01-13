@@ -20,6 +20,7 @@ use dml_exception;
 use Exception;
 use Google\Cloud\Storage\StorageClient;
 use local_alternative_file_system\i_file_system;
+use local_alternative_file_system\storages\s3\S3;
 use local_alternative_file_system\storages\storage_file_system;
 use stored_file;
 
@@ -134,29 +135,6 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function remove_file($contenthash) {
-        global $DB;
-
-        // If any file record still references this contenthash, do not delete remotely.
-        if ($DB->record_exists('files', ['contenthash' => $contenthash])) {
-            return true;
-        }
-
-        // No references in mdl_files: safe to delete from remote storage.
-        $config = get_config('local_alternative_file_system');
-        $uri = $this->get_local_path_from_hash($contenthash);
-
-        try {
-            $bucket = S3::bucket($config->settings_gcs_bucketname);
-            $bucket->object($uri)->delete();
-        } catch (\Throwable $e) {
-        }
-
-        // Remove tracking row only for this storage.
-        $DB->delete_records('local_alternativefilesystemf', [
-            'contenthash' => $contenthash,
-            'storage' => $config->settings_destino,
-        ]);
-
         return true;
     }
 
