@@ -116,7 +116,7 @@ class move_from_objectfs extends scheduled_task {
          * @param string $prefix
          * @return string
          */
-        $build_object_key = static function(string $contenthash, string $prefix) : string {
+        $buildobjectkey = static function(string $contenthash, string $prefix) : string {
             $a1 = substr($contenthash, 0, 2);
             $a2 = substr($contenthash, 2, 2);
             return $prefix . "{$a1}/{$a2}/{$contenthash}";
@@ -163,7 +163,7 @@ class move_from_objectfs extends scheduled_task {
             $downloaded = false;
 
             if (!file_exists($localfile)) {
-                $objectkey = $build_object_key($obj->contenthash, $doprefix);
+                $objectkey = $buildobjectkey($obj->contenthash, $doprefix);
                 $sourcefile = "{$tempdir}/{$obj->contenthash}";
 
                 // Ensure old tmp is not reused.
