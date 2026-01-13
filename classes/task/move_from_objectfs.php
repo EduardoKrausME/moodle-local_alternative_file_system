@@ -87,7 +87,8 @@ class move_from_objectfs extends scheduled_task {
 
         if (empty($destconfig->settings_destino) || $destconfig->settings_destino === "local") {
             $error = $PAGE->get_renderer("core")->render(
-                new notification("Invalid destination. Configure the local_alternative_file_system to a remote destination (s3/space).", notification::NOTIFY_ERROR)
+                new notification("Invalid destination. Configure the local_alternative_file_system" .
+                    " to a remote destination (s3/space).", notification::NOTIFY_ERROR)
             );
             mtrace($error);
             return;
