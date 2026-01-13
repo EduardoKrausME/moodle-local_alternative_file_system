@@ -63,5 +63,26 @@ function xmldb_local_alternative_file_system_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024110501, "local", "alternative_file_system");
     }
 
+    if ($oldversion < 2026011300) {
+        $table = new xmldb_table('local_alternativefilesystemf');
+
+        $index = new xmldb_index('contenthash', XMLDB_INDEX_NOTUNIQUE, ['contenthash']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('storage-contenthash', XMLDB_INDEX_NOTUNIQUE, ['storage', 'contenthash']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('storage-timemodifield', XMLDB_INDEX_NOTUNIQUE, ['storage', 'timemodifield']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2026011300, 'local', 'alternative_file_system');
+    }
+
     return true;
 }

@@ -17,6 +17,11 @@
                 <KEY NAME="contenthash" TYPE="unique" FIELDS="contenthash, storage"/>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
             </KEYS>
+            <INDEXES>
+                <INDEX NAME="contenthash" UNIQUE="false" FIELDS="contenthash"/>
+                <INDEX NAME="storage-contenthash" UNIQUE="false" FIELDS="storage, contenthash"/>
+                <INDEX NAME="storage-timemodifield" UNIQUE="false" FIELDS="storage, timemodifield"/>
+            </INDEXES>
         </TABLE>
 
     </TABLES>
