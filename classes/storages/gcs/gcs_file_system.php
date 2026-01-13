@@ -74,7 +74,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
         $pathname = "{$CFG->tempdir}/teste.txt";
         file_put_contents($pathname, "123");
 
-        $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
+        $bucket = S3::bucket($config->settings_gcs_bucketname);
         $filename = $this->get_local_path_from_hash(md5("1"));
         $stream = fopen($pathname, "r");
         $options = ["name" => $filename];
@@ -100,38 +100,34 @@ class gcs_file_system extends storage_file_system implements i_file_system {
 
         $config = get_config("local_alternative_file_system");
 
-        $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
+        $bucket = S3::bucket($config->settings_gcs_bucketname);
         $object = $bucket->object($this->get_local_path_from_hash($contenthash));
 
         return $object->signedUrl(time() + 1500);
     }
 
     /**
-     * Copy content of file to given pathname.
+     * Copy stored_file content to a local path.
      *
-     * @param stored_file $file The file to be copied
-     * @param string $target real path to the new file
-     * @return bool success
+     * @param stored_file $file
+     * @param string $target
+     * @return bool
      * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
-        $config = get_config("local_alternative_file_system");
+        $config = get_config('local_alternative_file_system');
 
-        try {
-            $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
-            $object = $bucket->object($this->get_remote_path_from_storedfile($file));
+        $bucket = S3::bucket($config->settings_gcs_bucketname);
+        $object = $bucket->object($this->get_local_path_from_hash($file->get_contenthash()));
 
-            $object->copy($target);
+        $object->downloadToFile($target);
 
-            $this->report_save($file->get_contenthash());
-        } catch (Exception $e) { // phpcs:disable
-        }
-
+        $this->report_save($file->get_contenthash());
         return true;
     }
 
     /**
-     * Removes the file.
+     * Remove a file from the remote storage if it is no longer referenced in {files}.
      *
      * @param string $contenthash
      * @return bool
@@ -139,6 +135,27 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      */
     public function remove_file($contenthash) {
         global $DB;
+
+        // If any file record still references this contenthash, do not delete remotely.
+        if ($DB->record_exists('files', ['contenthash' => $contenthash])) {
+            return true;
+        }
+
+        // No references in mdl_files: safe to delete from remote storage.
+        $config = get_config('local_alternative_file_system');
+        $uri = $this->get_local_path_from_hash($contenthash);
+
+        try {
+            $bucket = S3::bucket($config->settings_gcs_bucketname);
+            $bucket->object($uri)->delete();
+        } catch (\Throwable $e) {
+        }
+
+        // Remove tracking row only for this storage.
+        $DB->delete_records('local_alternativefilesystemf', [
+            'contenthash' => $contenthash,
+            'storage' => $config->settings_destino,
+        ]);
 
         return true;
     }
@@ -155,7 +172,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
     public function upload($sourcefile, $filename, $contenttype, $contentdisposition) {
         $config = get_config("local_alternative_file_system");
 
-        $bucket = $this->get_instance()->bucket($config->settings_gcs_bucketname);
+        $bucket = S3::bucket($config->settings_gcs_bucketname);
         $stream = fopen($sourcefile, "r");
         $options = [
             "name" => $filename,
