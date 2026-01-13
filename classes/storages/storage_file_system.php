@@ -16,6 +16,7 @@
 
 namespace local_alternative_file_system\storages;
 
+use cache;
 use dml_exception;
 use Exception;
 use file_exception;
@@ -146,7 +147,7 @@ class storage_file_system extends file_system {
         }
 
         $hash = $file->get_contenthash();
-        $cache = \cache::make("core", "file_imageinfo");
+        $cache = cache::make("core", "file_imageinfo");
         $info = $cache->get($hash);
         if ($info !== false) {
             return $info;
@@ -248,12 +249,19 @@ class storage_file_system extends file_system {
      *
      * @return int
      *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function missing_count() {
         global $DB;
 
         $config = get_config("local_alternative_file_system");
+        $cache = cache::make("local_alternative_file_system", "missing_count");
+        $cachekey = "destino_{$config->settings_destino}";
+
+        $cached = $cache->get($cachekey);
+        if ($cached !== false) {
+            return (int)$cached;
+        }
 
         $sql = "SELECT COUNT(*) AS num_files
                   FROM {files}
@@ -266,6 +274,7 @@ class storage_file_system extends file_system {
                    AND filesize    > 2
                    AND mimetype    IS NOT NULL";
         $result = $DB->get_record_sql($sql);
+        $cache->set($cachekey, $result->num_files);
         return $result->num_files;
     }
 
