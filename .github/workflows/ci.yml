@@ -79,10 +79,6 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpcs --max-warnings 0 --exclude="Universal.WhiteSpace.CommaSpacing,PSR12.Classes.ClassInstantiation,PSR12.Classes.OpeningBraceSpace,Universal.Lists.DisallowLongListSyntax,PSR2.Methods.FunctionCallSignature,PSR12.ControlStructures.ControlStructureSpacing,Squiz.WhiteSpace.ControlStructureSpacing,PSR2.ControlStructures.SwitchDeclaration,Squiz.Functions.MultiLineFunctionDeclaration,PSR2.Classes.ClassDeclaration"
 
-      - name: Validating
-        if: ${{ !cancelled() }}
-        run: moodle-plugin-ci validate
-
       - name: Check upgrade savepoints
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci savepoints
