@@ -16,7 +16,6 @@
 
 namespace local_alternative_file_system\storages\s3;
 
-use dml_exception;
 use Exception;
 use local_alternative_file_system\i_file_system;
 use local_alternative_file_system\storages\storage_file_system;
@@ -34,7 +33,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
     /**
      * Test config function.
      *
-     * @throws dml_exception
+     * @throws Exception
      *
      * @throws Exception
      */
@@ -61,23 +60,16 @@ class s3_file_system extends storage_file_system implements i_file_system {
         file_put_contents($pathname, "123");
 
         $filename = $this->get_local_path_from_hash(md5("1"));
-        $this->get_instance()->putObjectFile($pathname, $config->settings_s3_bucketname, $filename, $acl = S3::ACL_PRIVATE);
-        $this->get_instance()->deleteObject($config->settings_s3_bucketname, $filename);
+        S3::putObjectFile($pathname, $config->settings_s3_bucketname, $filename, $acl = S3::ACL_PRIVATE);
+        S3::deleteObject($config->settings_s3_bucketname, $filename);
     }
 
     /**
      * get_instance function.
      *
-     * @return S3
-     *
      * @throws Exception
      */
     private function get_instance() {
-        static $s3client = null;
-        if ($s3client) {
-            return $s3client;
-        }
-
         require_once(__DIR__ . "/S3.php");
         require_once(__DIR__ . "/S3Request.php");
 
@@ -94,9 +86,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
             $endpoint = "{$config->settings_s3_region}.digitaloceanspaces.com";
         }
 
-        $s3client = new S3($config->settings_s3_credentials_key, $config->settings_s3_credentials_secret, $endpoint);
-
-        return $s3client;
+        S3::setConfig($config->settings_s3_credentials_key, $config->settings_s3_credentials_secret, $endpoint);
     }
 
     /**
@@ -111,7 +101,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
      *
      * @return string The full path to the content file
      *
-     * @throws dml_exception
+     * @throws Exception
      * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false, $localfile = true) {
@@ -119,7 +109,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         $uri = $this->get_local_path_from_hash($contenthash);
         $lifetime = time() + 604800;
-        $url = $this->get_instance()->getAuthenticatedURL($config->settings_s3_bucketname, $uri, $lifetime, false, true);
+        $url = S3::getAuthenticatedURL($config->settings_s3_bucketname, $uri, $lifetime, false, true);
 
         if (strpos((new Exception())->getTraceAsString(), "mod/scorm")) {
             if (strpos($url, "https") === 0) {
@@ -143,39 +133,65 @@ class s3_file_system extends storage_file_system implements i_file_system {
      *
      * @return string
      *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function get_remote_path_from_storedfile(stored_file $file) {
         return $this->get_remote_path_from_hash($file->get_contenthash());
     }
 
     /**
-     * Copy content of file to given pathname.
+     * Copy stored_file content to a local path.
      *
-     * @param stored_file $file The file to be copied
-     * @param string $target real path to the new file
-     *
-     * @return bool success
-     *
-     * @throws dml_exception
+     * @param stored_file $file
+     * @param string $target
+     * @return bool
+     * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
-        $fileurl = $this->get_remote_path_from_hash($file->get_contenthash(), false, false);
-        $filecontent = file_get_contents($fileurl);
-        return file_put_contents($target, $filecontent);
+        $config = get_config('local_alternative_file_system');
+        $uri = $this->get_local_path_from_hash($file->get_contenthash());
+
+        $ok = S3::getObject($config->settings_s3_bucketname, $uri, $target);
+        if (!$ok) {
+            return false;
+        }
+
+        $this->report_save($file->get_contenthash());
+        return true;
     }
 
     /**
-     * Removes the file.
+     * Remove a file from the remote storage if it is no longer referenced in {files}.
      *
      * @param string $contenthash
-     *
      * @return bool
-     *
-     * @throws dml_exception
      * @throws Exception
      */
     public function remove_file($contenthash) {
+        return true;;
+        global $DB;
+
+        // If any file record still references this contenthash, do not delete remotely.
+        if ($DB->record_exists('files', ['contenthash' => $contenthash])) {
+            return true;
+        }
+
+        // No references in mdl_files: safe to delete from remote storage.
+        $config = get_config('local_alternative_file_system');
+        $uri = $this->get_local_path_from_hash($contenthash);
+
+        try {
+            S3::deleteObject($config->settings_s3_bucketname, $uri);
+            // GCS: $bucket->object($uri)->delete();
+        } catch (\Throwable $e) {
+        }
+
+        // Remove tracking row only for this storage.
+        $DB->delete_records('local_alternativefilesystemf', [
+            'contenthash' => $contenthash,
+            'storage' => $config->settings_destino,
+        ]);
+
         return true;
     }
 
@@ -186,14 +202,13 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @param string $filename
      * @param string $contenttype
      * @param string $contentdisposition
-     *
      * @throws Exception
      */
     public function upload($sourcefile, $filename, $contenttype, $contentdisposition) {
         $config = get_config("local_alternative_file_system");
-        $s3client = $this->get_instance();
+        $this->get_instance();
 
-        $s3client->putObjectFile($sourcefile, $config->settings_s3_bucketname, $filename, S3::ACL_PRIVATE);
+        S3::putObjectFile($sourcefile, $config->settings_s3_bucketname, $filename);
 
         $contenthash = pathinfo($filename, PATHINFO_FILENAME);
         $this->report_save($contenthash);

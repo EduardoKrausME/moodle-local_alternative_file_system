@@ -320,14 +320,15 @@ final class S3Request {
         }
 
         // Execute, grab errors
-        if (curl_exec($curl))
+        if (curl_exec($curl)) {
             $this->response->code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        else
-            $this->response->error = array(
+        } else {
+            $this->response->error = [
                 'code' => curl_errno($curl),
                 'message' => curl_error($curl),
-                'resource' => $this->resource
-            );
+                'resource' => $this->resource,
+            ];
+        }
 
         @curl_close($curl);
 
@@ -383,11 +384,12 @@ final class S3Request {
      *
      * @return integer
      */
-    private function __responseWriteCallback(&$curl, &$data) {
-        if (in_array($this->response->code, array(200, 206)) && $this->fp !== false)
+    private function __responseWriteCallback($curl, $data) {
+        if (in_array($this->response->code, [200, 206]) && $this->fp !== false) {
             return fwrite($this->fp, $data);
-        else
+        } else {
             $this->response->body .= $data;
+        }
         return strlen($data);
     }
 

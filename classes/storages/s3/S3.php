@@ -162,7 +162,7 @@ class S3 {
     private static $__signingKeyResource = false;
 
     /**
-     * Constructor - if you're not using the class statically
+     * if you're not using the class statically
      *
      * @param string $accessKey Access key
      * @param string $secretKey Secret key
@@ -170,9 +170,10 @@ class S3 {
      *
      * @return void
      */
-    public function __construct($accessKey = null, $secretKey = null, $endpoint = 's3.amazonaws.com') {
-        if ($accessKey !== null && $secretKey !== null)
+    public static function setConfig($accessKey = null, $secretKey = null, $endpoint = 's3.amazonaws.com') {
+        if ($accessKey !== null && $secretKey !== null) {
             self::setAuth($accessKey, $secretKey);
+        }
         self::$endpoint = $endpoint;
     }
 
