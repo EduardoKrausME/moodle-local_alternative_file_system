@@ -168,7 +168,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function remove_file($contenthash) {
-        return true;;
+        return true;; // phpcs:disable Generic.Formatting.DisallowMultipleStatements.SameLine
         global $DB;
 
         // If any file record still references this contenthash, do not delete remotely.
@@ -182,8 +182,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         try {
             S3::deleteObject($config->settings_s3_bucketname, $uri);
-            // GCS: $bucket->object($uri)->delete();
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) { // phpcs:disable Squiz.Commenting.EmptyCatchComment.Missing
         }
 
         // Remove tracking row only for this storage.
