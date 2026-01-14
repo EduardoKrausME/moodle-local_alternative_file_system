@@ -54,8 +54,7 @@ if (optional_param("execute", false, PARAM_INT)) {
 
     $sql = "SELECT id, contenthash, mimetype, filename
               FROM {files}
-             WHERE filename LIKE '__%'
-               AND filesize > 2
+             WHERE filename <> '.'
                AND mimetype IS NOT NULL";
     $files = $DB->get_recordset_sql($sql);
     /** @var object $file */

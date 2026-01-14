@@ -26,6 +26,7 @@
 
 use core\output\notification;
 
+$CFGdebug = true;
 require_once(__DIR__ . "/../../config.php");
 
 require_login();
@@ -220,8 +221,7 @@ foreach ($storages as $s) {
     $sqltotal = "
         SELECT COUNT(DISTINCT contenthash)
           FROM {files}
-         WHERE filename LIKE '___%'
-           AND filesize > 1";
+         WHERE filename <> '.'";
     $totalhashes = $DB->count_records_sql($sqltotal, []);
 
     // Migrated: unique(contenthash, storage) so COUNT(*) is migrated hashes.

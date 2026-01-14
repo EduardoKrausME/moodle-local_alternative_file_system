@@ -237,7 +237,7 @@ class storage_file_system extends file_system {
 
         $config = get_config("local_alternative_file_system");
 
-        $sql = "SELECT COUNT(contenthash) AS num_files
+        $sql = "SELECT COUNT(*) AS num_files
                   FROM {local_alternativefilesystemf}
                  WHERE storage = '{$config->settings_destino}'";
         $result = $DB->get_record_sql($sql);
@@ -270,9 +270,8 @@ class storage_file_system extends file_system {
                           FROM {local_alternativefilesystemf}
                          WHERE storage = '{$config->settings_destino}'
                      )
-                   AND filename    LIKE '__%'
-                   AND filesize    > 2
-                   AND mimetype    IS NOT NULL";
+                   AND filename <> '.'
+                   AND mimetype IS NOT NULL";
         $result = $DB->get_record_sql($sql);
         $cache->set($cachekey, $result->num_files);
         return $result->num_files;

@@ -84,5 +84,16 @@ function xmldb_local_alternative_file_system_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026011300, 'local', 'alternative_file_system');
     }
 
+    if ($oldversion < 2026011400) {
+        $table = new xmldb_table('local_alternativefilesystemf');
+
+        $index = new xmldb_index('storage', XMLDB_INDEX_NOTUNIQUE, ['storage']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2026011400, 'local', 'alternative_file_system');
+    }
+
     return true;
 }

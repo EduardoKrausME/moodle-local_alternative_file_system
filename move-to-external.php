@@ -58,9 +58,8 @@ if (optional_param("execute", false, PARAM_INT)) {
                       FROM {local_alternativefilesystemf}
                      WHERE storage = '{$config->settings_destino}'
                  )
-               AND filename    LIKE '__%'
-               AND filesize    > 2
-               AND mimetype    IS NOT NULL";
+               AND filename <> '.'
+               AND mimetype IS NOT NULL";
     $files = $DB->get_recordset_sql($sql);
     /** @var object $file */
     foreach ($files as $file) {

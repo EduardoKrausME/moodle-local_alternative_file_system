@@ -21,6 +21,7 @@
                 <INDEX NAME="contenthash" UNIQUE="false" FIELDS="contenthash"/>
                 <INDEX NAME="storage-contenthash" UNIQUE="false" FIELDS="storage, contenthash"/>
                 <INDEX NAME="storage-timemodifield" UNIQUE="false" FIELDS="storage, timemodifield"/>
+                <INDEX NAME="storage" UNIQUE="false" FIELDS="storage"/>
             </INDEXES>
         </TABLE>
 
