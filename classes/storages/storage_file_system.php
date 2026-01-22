@@ -36,7 +36,6 @@ require_once("{$CFG->dirroot}/lib/filestorage/file_system.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class storage_file_system extends file_system {
-
     /**
      * get_local_path_from_hash function.
      *
@@ -263,15 +262,11 @@ class storage_file_system extends file_system {
             return (int)$cached;
         }
 
-        $sql = "SELECT COUNT(*) AS num_files
-                  FROM {files}
-                 WHERE contenthash NOT IN (
-                        SELECT contenthash
-                          FROM {local_alternativefilesystemf}
-                         WHERE storage = '{$config->settings_destino}'
-                     )
-                   AND filename <> '.'
-                   AND mimetype IS NOT NULL";
+        $sql = "
+            SELECT COUNT( DISTINCT contenthash ) AS num_files
+              FROM mdl_files
+             WHERE filename <> '.'
+               AND mimetype IS NOT NULL";
         $result = $DB->get_record_sql($sql);
         $cache->set($cachekey, $result->num_files);
         return $result->num_files;
@@ -370,10 +365,22 @@ class storage_file_system extends file_system {
      *
      * @return bool
      *
-     * @throws dml_exception
      * @throws Exception
      */
     public function remove_file($contenthash) {
         // Implemented in storage_file_system.php.
+    }
+
+    /**
+     * Build the remote object key in object storage from a contenthash
+     *
+     * @param string $contenthash
+     * @param string $prefix
+     * @return string
+     */
+    public static function buildobjectkey(string $contenthash, string $prefix): string {
+        $a1 = substr($contenthash, 0, 2);
+        $a2 = substr($contenthash, 2, 2);
+        return  "{$prefix}{$a1}/{$a2}/{$contenthash}";
     }
 }
