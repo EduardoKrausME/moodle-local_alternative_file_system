@@ -70,46 +70,45 @@ if (optional_param("execute", false, PARAM_INT)) {
         $localfile = "{$CFG->dataroot}/filedir/{$a1}/{$a2}/{$file->contenthash}";
 
         if (file_exists($localfile) && filesize($localfile)) {
-            echo "# {$file->id} => {$file->filename} => {$localfile} - Local OK<br>";
+            echo "# {$file->filename} - Local OK<br>";
             continue;
-        } else {
-            echo "# {$file->id} => {$file->filename} - To go down<br>";
+        }
 
-            try {
-                $url = $externalfilesystem->get_remote_path_from_hash($file->contenthash);
+        echo "# {$file->filename} - To go down<br>";
+        try {
+            $url = $externalfilesystem->get_remote_path_from_hash($file->contenthash);
 
-                $objectkey = $s3filesystem->get_local_path_from_hash($file->contenthash);
-                $link = $s3filesystem->getAuthenticatedURL($objectkey, time() + 4800);
-                @mkdir("{$CFG->dataroot}/filedir/{$a1}/{$a2}", 0777, true);
-                $fp = fopen($localfile, 'wb');
+            $objectkey = $s3filesystem->get_local_path_from_hash($file->contenthash);
+            $link = $s3filesystem->getAuthenticatedURL($objectkey, time() + 4800);
+            @mkdir("{$CFG->dataroot}/filedir/{$a1}/{$a2}", 0777, true);
+            $fp = fopen($localfile, 'wb');
 
-                $ch = curl_init($link);
-                curl_setopt_array($ch, [
-                    CURLOPT_FILE => $fp,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_CONNECTTIMEOUT => 10,
-                    CURLOPT_TIMEOUT => 60,
-                    CURLOPT_FAILONERROR => false,
-                    CURLOPT_USERAGENT => 'cURL',
-                ]);
-                $ok = curl_exec($ch);
+            $ch = curl_init($link);
+            curl_setopt_array($ch, [
+                CURLOPT_FILE => $fp,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_CONNECTTIMEOUT => 10,
+                CURLOPT_TIMEOUT => 60,
+                CURLOPT_FAILONERROR => false,
+                CURLOPT_USERAGENT => 'cURL',
+            ]);
+            $ok = curl_exec($ch);
 
-                $curlerrno = curl_errno($ch);
-                $curlerrmsg = curl_error($ch);
-                $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlerrno = curl_errno($ch);
+            $curlerrmsg = curl_error($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-                curl_close($ch);
-                fclose($fp);
+            curl_close($ch);
+            fclose($fp);
 
-                if ($ok === false || $curlerrno) {
-                    echo "Erro cURL ({$curlerrno}): {$curlerrmsg}<br>";
-                }
-                if ($httpcode < 200 || $httpcode >= 300) {
-                    echo "Download failed. HTTP {$httpcode}<br>";
-                }
-            } catch (Exception $e) {
-                echo $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
+            if ($ok === false || $curlerrno) {
+                echo "Erro cURL ({$curlerrno}): {$curlerrmsg}<br>";
             }
+            if ($httpcode < 200 || $httpcode >= 300) {
+                echo "Download failed. HTTP {$httpcode}<br>";
+            }
+        } catch (Exception $e) {
+            echo $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
         }
     }
     $files->close();
