@@ -144,12 +144,9 @@ class move_from_objectfs extends scheduled_task {
               ORDER BY {$rand}";
         $recordset = $DB->get_recordset_sql($sql, [], 0, 100000);
 
-        $processed = 0;
         $tempdir = make_temp_directory("local_alternative_file_system/objectfs");
 
         foreach ($recordset as $obj) {
-            $processed++;
-
             if ($DB->get_record("local_alternativefilesystemf", ["contenthash" => $obj->contenthash])) {
                 continue;
             }
