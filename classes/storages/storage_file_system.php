@@ -370,17 +370,4 @@ class storage_file_system extends file_system {
     public function remove_file($contenthash) {
         // Implemented in storage_file_system.php.
     }
-
-    /**
-     * Build the remote object key in object storage from a contenthash
-     *
-     * @param string $contenthash
-     * @param string $prefix
-     * @return string
-     */
-    public static function buildobjectkey(string $contenthash, string $prefix): string {
-        $a1 = substr($contenthash, 0, 2);
-        $a2 = substr($contenthash, 2, 2);
-        return  "{$prefix}{$a1}/{$a2}/{$contenthash}";
-    }
 }

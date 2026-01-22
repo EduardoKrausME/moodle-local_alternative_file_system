@@ -23,14 +23,19 @@
 
 use core\output\notification;
 use local_alternative_file_system\external_file_system;
+use local_alternative_file_system\storages\s3\S3;
+use local_alternative_file_system\storages\s3\s3_file_system;
+use local_alternative_file_system\storages\storage_file_system;
 
 define('OPEN_INTERNAL', true);
+
+global $CFG, $DB, $OUTPUT, $PAGE;
 
 require_once("../../config.php");
 
 ignore_user_abort(true);
 set_time_limit(0); // Executa indefinidamente.
-ini_set('max_execution_time', 0); // Alternativa.
+ini_set('max_execution_time', 0);
 
 require_login();
 require_capability("moodle/site:config", context_system::instance());
@@ -38,8 +43,8 @@ require_capability("moodle/site:config", context_system::instance());
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagetype("my-index");
 $PAGE->set_url(new moodle_url("/local/alternative_file_system/move-to-external.php"));
-$PAGE->set_title(get_string("migrate_title", "local_alternative_file_system"));
-$PAGE->set_heading(get_string("migrate_title", "local_alternative_file_system"));
+$PAGE->set_title(get_string("migrate_title_tolocal", "local_alternative_file_system"));
+$PAGE->set_heading(get_string("migrate_title_tolocal", "local_alternative_file_system"));
 
 echo $OUTPUT->header();
 
@@ -47,10 +52,11 @@ $config = get_config("local_alternative_file_system");
 $externalfilesystem = new external_file_system();
 
 if (optional_param("execute", false, PARAM_INT)) {
-
     session_write_close();
     set_time_limit(0);
     ob_end_flush();
+
+    $s3filesystem = new s3_file_system();
 
     $sql = "SELECT id, contenthash, mimetype, filename
               FROM {files}
@@ -63,20 +69,44 @@ if (optional_param("execute", false, PARAM_INT)) {
         $a2 = substr($file->contenthash, 2, 2);
         $localfile = "{$CFG->dataroot}/filedir/{$a1}/{$a2}/{$file->contenthash}";
 
-        if (file_exists($localfile)) {
-            echo "{$file->id} => {$file->filename} => {$localfile} - OK<br>";
+        if (file_exists($localfile) && filesize($localfile)) {
+            echo "# {$file->id} => {$file->filename} => {$localfile} - Local OK<br>";
+            continue;
         } else {
-            echo "{$file->id} => {$file->filename} - Baixar<br>";
+            echo "# {$file->id} => {$file->filename} - To go down<br>";
 
             try {
                 $url = $externalfilesystem->get_remote_path_from_hash($file->contenthash);
-                $filecontent = file_get_contents($url);
 
-                mkdir("{$CFG->dataroot}/filedir/{$a1}");
-                mkdir("{$CFG->dataroot}/filedir/{$a1}/{$a2}");
+                $objectkey = $s3filesystem->get_local_path_from_hash($file->contenthash);
+                $link = $s3filesystem->getAuthenticatedURL($objectkey, time() + 4800);
+                @mkdir("{$CFG->dataroot}/filedir/{$a1}/{$a2}", 0777, true);
+                $fp = fopen($localfile, 'wb');
 
-                file_put_contents($localfile, $filecontent);
+                $ch = curl_init($link);
+                curl_setopt_array($ch, [
+                    CURLOPT_FILE => $fp,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_CONNECTTIMEOUT => 10,
+                    CURLOPT_TIMEOUT => 60,
+                    CURLOPT_FAILONERROR => false,
+                    CURLOPT_USERAGENT => 'cURL',
+                ]);
+                $ok = curl_exec($ch);
 
+                $curlerrno = curl_errno($ch);
+                $curlerrmsg = curl_error($ch);
+                $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                curl_close($ch);
+                fclose($fp);
+
+                if ($ok === false || $curlerrno) {
+                    echo "Erro cURL ({$curlerrno}): {$curlerrmsg}<br>";
+                }
+                if ($httpcode < 200 || $httpcode >= 300) {
+                    echo "Download failed. HTTP {$httpcode}<br>";
+                }
             } catch (Exception $e) {
                 echo $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
             }
@@ -84,8 +114,7 @@ if (optional_param("execute", false, PARAM_INT)) {
     }
     $files->close();
 } else {
-    $decsep = get_string("decsep", "langconfig");
-    $thousandssep = get_string("thousandssep", "langconfig");
+    echo get_string("migrate_total_local", "local_alternative_file_system");
     echo get_string("migrate_link", "local_alternative_file_system");
 }
 

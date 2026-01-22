@@ -324,7 +324,7 @@ class S3 {
      */
     private static function __triggerError($message, $file, $line, $code = 0) {
         if (self::$useExceptions) {
-           // throw new \Exception($message, $file, $line, $code);
+            throw new \Exception($message);
         } else {
             trigger_error($message, E_USER_WARNING);
         }

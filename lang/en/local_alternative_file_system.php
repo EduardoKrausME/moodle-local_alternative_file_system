@@ -27,8 +27,10 @@
 $string['instruction_install'] = '<p><strong>Add the line below to the Moodle <code>config.php</code> file:</strong></p><pre><code>$CFG->alternative_file_system_class = \'\local_alternative_file_system\external_file_system\';</code></pre><p><strong>Important:</strong> Insert this line <strong>before</strong> the following line, if it exists in your file:</p><pre><code>require_once(__DIR__ . \'/lib/setup.php\');</code></pre>';
 $string['instruction_title'] = 'Installation Instructions';
 $string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Execute Now (may take a long time)</a></p>';
-$string['migrate_title'] = 'Migrate Local to Remote Storage';
+$string['migrate_title'] = 'Migrate local storage to remote storage';
+$string['migrate_title_tolocal'] = 'Migrate remote storage to local storage';
 $string['migrate_total'] = '<p>You have <strong>{$a->missing}</strong> local files awaiting migration, while <strong>{$a->sending}</strong> files have already been migrated to the remote environment.</p>';
+$string['migrate_total_local'] = 'Moves files from remote storage back to local storage. This may take some time depending on the amount of data.';
 $string['pluginname'] = 'Alternative File System';
 $string['privacy:no_data_reason'] = 'The Alternative File System plugin does not store any personal data.';
 $string['settings_bucketname'] = '{$a->local} Bucket Name';
@@ -38,7 +40,8 @@ $string['settings_destinodesc'] = 'Choose the storage destination and save to lo
 $string['settings_gcs_keyfile'] = 'Google-storage.json Content';
 $string['settings_gcs_keyfiledesc'] = 'Paste here the content of the "google-storage.json" file.';
 $string['settings_local'] = 'Local files in Moodle';
-$string['settings_migrate'] = 'Use the service <a target="_blank" href="{$a->url}">move-to-external.php</a> to migrate local data to {$a->local}.';
+$string['settings_migrate_local']  = 'Use the <a target="_blank" href="{$a->url}/move-to-local.php">move-to-local.php</a> service to migrate data from {$a->local} to local storage.';
+$string['settings_migrate_remote'] = 'Use the <a target="_blank" href="{$a->url}/move-to-external.php">move-to-external.php</a> service to migrate data from local storage to {$a->local}.';
 $string['settings_path'] = '{$a->local} Object Path';
 $string['settings_pathdesc'] = 'The path within the bucket where objects will be stored. Only letters and numbers are accepted.';
 $string['settings_s3_credentials_key'] = '{$a->local} Access Key';

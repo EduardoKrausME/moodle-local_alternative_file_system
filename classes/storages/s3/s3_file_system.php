@@ -19,6 +19,7 @@ namespace local_alternative_file_system\storages\s3;
 use Exception;
 use local_alternative_file_system\i_file_system;
 use local_alternative_file_system\storages\storage_file_system;
+use stdClass;
 use stored_file;
 use Throwable;
 
@@ -31,6 +32,9 @@ use Throwable;
  */
 class s3_file_system extends storage_file_system implements i_file_system {
 
+    /** @var stdClass */
+    private $config;
+
     /**
      * Test config function.
      *
@@ -41,19 +45,16 @@ class s3_file_system extends storage_file_system implements i_file_system {
     public function test_config() {
         global $CFG;
 
-        $this->get_instance();
-
-        $config = get_config("local_alternative_file_system");
-        if (!isset($config->settings_path)) {
+        if (!isset($this->config->settings_path)) {
             return null;
         }
 
-        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $config->settings_path);
-        if ($settingspath != $config->settings_path) {
+        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $this->config->settings_path);
+        if ($settingspath != $this->config->settings_path) {
             set_config("settings_path", $settingspath, "local_alternative_file_system");
         }
-        $settingss3region = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $config->settings_s3_region);
-        if ($settingss3region != $config->settings_s3_region) {
+        $settingss3region = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $this->config->settings_s3_region);
+        if ($settingss3region != $this->config->settings_s3_region) {
             set_config("settings_s3_region", $settingss3region, "local_alternative_file_system");
         }
 
@@ -61,33 +62,44 @@ class s3_file_system extends storage_file_system implements i_file_system {
         file_put_contents($pathname, "123");
 
         $filename = $this->get_local_path_from_hash(md5("1"));
-        S3::putObjectFile($pathname, $config->settings_s3_bucketname, $filename, $acl = S3::ACL_PRIVATE);
-        S3::deleteObject($config->settings_s3_bucketname, $filename);
+        S3::putObjectFile($pathname, $this->config->settings_s3_bucketname, $filename);
+        S3::deleteObject($this->config->settings_s3_bucketname, $filename);
     }
 
     /**
-     * get_instance function.
+     * __construct function.
      *
      * @throws Exception
      */
-    private function get_instance() {
+    public function __construct() {
         require_once(__DIR__ . "/S3.php");
         require_once(__DIR__ . "/S3Request.php");
 
-        $config = get_config("local_alternative_file_system");
+        $this->config = get_config("local_alternative_file_system");
 
-        if (!isset($config->settings_destino)) {
+        if (!isset($this->config->settings_destino)) {
             return null;
         }
 
         $endpoint = "";
-        if ($config->settings_destino == "s3") {
-            $endpoint = "s3.{$config->settings_s3_region}.amazonaws.com";
-        } else if ($config->settings_destino == "space") {
-            $endpoint = "{$config->settings_s3_region}.digitaloceanspaces.com";
+        if ($this->config->settings_destino == "s3") {
+            $endpoint = "s3.{$this->config->settings_s3_region}.amazonaws.com";
+        } else if ($this->config->settings_destino == "space") {
+            $endpoint = "{$this->config->settings_s3_region}.digitaloceanspaces.com";
         }
 
-        S3::setConfig($config->settings_s3_credentials_key, $config->settings_s3_credentials_secret, $endpoint);
+        S3::setConfig($this->config->settings_s3_credentials_key, $this->config->settings_s3_credentials_secret, $endpoint);
+    }
+
+    /**
+     * Function getAuthenticatedURL
+     *
+     * @param $objectkey
+     * @param $lifetime
+     * @return string
+     */
+    public function getAuthenticatedURL($objectkey, $lifetime) {
+        return S3::getAuthenticatedURL($this->config->settings_s3_bucketname, $objectkey, $lifetime);
     }
 
     /**
@@ -106,11 +118,9 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false, $localfile = true) {
-        $config = get_config("local_alternative_file_system");
-
         $uri = $this->get_local_path_from_hash($contenthash);
         $lifetime = time() + 604800;
-        $url = S3::getAuthenticatedURL($config->settings_s3_bucketname, $uri, $lifetime, false, true);
+        $url = S3::getAuthenticatedURL($this->config->settings_s3_bucketname, $uri, $lifetime, false, true);
 
         if (strpos((new Exception())->getTraceAsString(), "mod/scorm")) {
             if (strpos($url, "https") === 0) {
@@ -149,10 +159,9 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
-        $config = get_config('local_alternative_file_system');
         $uri = $this->get_local_path_from_hash($file->get_contenthash());
 
-        $ok = S3::getObject($config->settings_s3_bucketname, $uri, $target);
+        $ok = S3::getObject($this->config->settings_s3_bucketname, $uri, $target);
         if (!$ok) {
             return false;
         }
@@ -178,11 +187,10 @@ class s3_file_system extends storage_file_system implements i_file_system {
         }
 
         // No references in mdl_files: safe to delete from remote storage.
-        $config = get_config('local_alternative_file_system');
         $uri = $this->get_local_path_from_hash($contenthash);
 
         try {
-            S3::deleteObject($config->settings_s3_bucketname, $uri);
+            S3::deleteObject($this->config->settings_s3_bucketname, $uri);
         } catch (Throwable $e) {
             return false;
         }
@@ -190,7 +198,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
         // Remove tracking row only for this storage.
         $DB->delete_records('local_alternativefilesystemf', [
             'contenthash' => $contenthash,
-            'storage' => $config->settings_destino,
+            'storage' => $this->config->settings_destino,
         ]);
 
         return true;
@@ -206,10 +214,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function upload($sourcefile, $filename, $contenttype, $contentdisposition) {
-        $config = get_config("local_alternative_file_system");
-        $this->get_instance();
-
-        S3::putObjectFile($sourcefile, $config->settings_s3_bucketname, $filename);
+        S3::putObjectFile($sourcefile, $this->config->settings_s3_bucketname, $filename);
 
         $contenthash = pathinfo($filename, PATHINFO_FILENAME);
         $this->report_save($contenthash);

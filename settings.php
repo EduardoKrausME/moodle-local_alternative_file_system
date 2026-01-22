@@ -35,25 +35,30 @@ if ($hassiteconfig) {
     $decsep = get_string("decsep", "langconfig");
     $thousandssep = get_string("thousandssep", "langconfig");
 
+    $section = optional_param('section', '', PARAM_ALPHANUMEXT);
+    $isthispluginsettings = ($section == 'local_alternative_file_system');
+
     $config = get_config("local_alternative_file_system");
     $settings = new admin_settingpage("local_alternative_file_system", get_string("pluginname", "local_alternative_file_system"));
 
     $ADMIN->add("localplugins", $settings);
 
-    if (!empty($CFG->alternative_file_system_class) && strpos($CFG->alternative_file_system_class, '\\tool_objectfs\\') !== false) {
-        $reporturl = new moodle_url('/local/alternative_file_system/report-migrate.php');
-        $reportlink = html_writer::link($reporturl, 'report-migrate.php');
-        $a = (object)[
-            'currentclass' => s($CFG->alternative_file_system_class),
-            'reportlink' => $reportlink,
-        ];
-        $msg = get_string('settings_objectfs_notice', 'local_alternative_file_system', $a);
+    if ($isthispluginsettings) {
+        if (!empty($CFG->alternative_file_system_class) && strpos($CFG->alternative_file_system_class, '\\tool_objectfs\\') !== false) {
+            $reporturl = new moodle_url('/local/alternative_file_system/report-migrate.php');
+            $reportlink = html_writer::link($reporturl, 'report-migrate.php');
+            $a = (object)[
+                'currentclass' => s($CFG->alternative_file_system_class),
+                'reportlink' => $reportlink,
+            ];
+            $msg = get_string('settings_objectfs_notice', 'local_alternative_file_system', $a);
 
-        $settings->add(new admin_setting_heading(
-            'local_alternative_file_system/objectfs_notice',
-            '',
-            $PAGE->get_renderer('core')->render(new notification($msg, notification::NOTIFY_INFO, false))
-        ));
+            $settings->add(new admin_setting_heading(
+                'local_alternative_file_system/objectfs_notice',
+                '',
+                $PAGE->get_renderer('core')->render(new notification($msg, notification::NOTIFY_INFO, false))
+            ));
+        }
     }
 
     if (!empty($CFG->alternative_file_system_class)) {
@@ -76,11 +81,11 @@ if ($hassiteconfig) {
         $PAGE->requires->js_call_amd("local_alternative_file_system/settings", "init");
 
         $datalang = [
-            "url" => "{$CFG->wwwroot}/local/alternative_file_system/move-to-external.php",
+            "url" => "{$CFG->wwwroot}/local/alternative_file_system",
             "local" => $settingsdestinos[$config->settings_destino],
         ];
 
-        if ($config->settings_destino == "s3" || $config->settings_destino == "space") {
+        if ($isthispluginsettings && $config->settings_destino == "s3" || $config->settings_destino == "space") {
             if ($config->settings_destino == "s3") {
                 $datalang["ex_region"] = "us-east-1";
             } else if ($config->settings_destino == "space") {
@@ -96,25 +101,25 @@ if ($hassiteconfig) {
                     $PAGE->get_renderer("core")->render(new notification($string, notification::NOTIFY_SUCCESS, false)));
                 $settings->add($setting);
 
-                if ($s3filesystem->missing_count()) {
+                $missing_count = $s3filesystem->missing_count();
+                $sending_count = $s3filesystem->sending_count();
+                if ($missing_count != $sending_count) {
                     $a = [
-                        "missing" => number_format($s3filesystem->missing_count(), 0, $decsep, $thousandssep),
-                        "sending" => number_format($s3filesystem->sending_count(), 0, $decsep, $thousandssep),
+                        "missing" => number_format($missing_count, 0, $decsep, $thousandssep),
+                        "sending" => number_format($sending_count, 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
-                    $string2 = get_string("settings_migrate", "local_alternative_file_system", $datalang);
+                    $string2 = get_string("settings_migrate_remote", "local_alternative_file_system", $datalang);
+                    $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
                     $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
-                        $PAGE->get_renderer("core")->render(new notification($string2, notification::NOTIFY_INFO, false)));
+                        $PAGE->get_renderer("core")->render(new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false))
+                    );
                     $settings->add($setting);
                 } else {
-                    $a = [
-                        "missing" => number_format($s3filesystem->missing_count(), 0, $decsep, $thousandssep),
-                        "sending" => number_format($s3filesystem->sending_count(), 0, $decsep, $thousandssep),
-                    ];
-                    $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
+                    $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
                     $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
-                        $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_SUCCESS, false)));
+                        $PAGE->get_renderer("core")->render(new notification($string3, notification::NOTIFY_INFO, false)));
                     $settings->add($setting);
                 }
 
@@ -177,10 +182,12 @@ if ($hassiteconfig) {
                         "sending" => number_format($gcsfilesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
-                    $string2 = get_string("settings_migrate", "local_alternative_file_system", $datalang);
+                    $string2 = get_string("settings_migrate_remote", "local_alternative_file_system", $datalang);
+                    $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
                     $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
-                        $PAGE->get_renderer("core")->render(new notification($string2, notification::NOTIFY_INFO, false)));
+                        $PAGE->get_renderer("core")->render(new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false))
+                    );
                     $settings->add($setting);
                 } else {
                     $a = [
