@@ -37,7 +37,7 @@ This is the classic scenario:
 
 ## Scenario B) Import/Migration from tool_objectfs (ObjectFS → local_alternative_file_system)
 
-> **Due to user/client requests**, support was added to **import objects stored in `tool_objectfs`** and copy them to the destination configured in this plugin, enabling migration with minimal downtime.
+
 
 ### How the strategy works (without stopping the site)
 
@@ -50,9 +50,6 @@ While Moodle is configured with:
 ```php
 $CFG->alternative_file_system_class = "\\tool_objectfs\\...";
 ```
-
-* The site continues reading/writing normally via `tool_objectfs`.
-* **CRON** runs a task that **copies** objects from `tool_objectfs` to the destination configured in `local_alternative_file_system`.
 
 In other words: you "duplicate" the objects to the new destination without interrupting the site.
 
