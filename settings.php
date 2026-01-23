@@ -44,7 +44,8 @@ if ($hassiteconfig) {
     $ADMIN->add("localplugins", $settings);
 
     if ($isthispluginsettings) {
-        if (!empty($CFG->alternative_file_system_class) && strpos($CFG->alternative_file_system_class, '\\tool_objectfs\\') !== false) {
+        if (!empty($CFG->alternative_file_system_class) &&
+            strpos($CFG->alternative_file_system_class, '\\tool_objectfs\\') !== false) {
             $reporturl = new moodle_url('/local/alternative_file_system/report-migrate.php');
             $a = (object) ["currentclass" => $CFG->alternative_file_system_class];
             if ($CFG->alternative_file_system_class == '\tool_objectfs\digitalocean_file_system') {
@@ -55,13 +56,15 @@ if ($hassiteconfig) {
                 $a->settings_bucketname = get_config("tool_objectfs", "do_space");
                 $a->settings_path = get_config("tool_objectfs", "do_prefix");
 
-                $a->settings_local_lang =  get_string("settings_destino", "local_alternative_file_system");
-                $a->settings_s3_region_lang =  get_string("settings_s3_region", "local_alternative_file_system", $a);
-                $a->settings_s3_credentials_key_lang =  get_string("settings_s3_credentials_key", "local_alternative_file_system", $a);
-                $a->settings_s3_credentials_secret_lang =  get_string("settings_s3_credentials_secret", "local_alternative_file_system", $a);
-                $a->settings_bucketname_lang =  get_string("settings_bucketname", "local_alternative_file_system", $a);
-                $a->settings_path_lang =  get_string("settings_path", "local_alternative_file_system", $a);
-            }else if ($CFG->alternative_file_system_class == '\tool_objectfs\s3_file_system') {
+                $a->settings_local_lang = get_string("settings_destino", "local_alternative_file_system");
+                $a->settings_s3_region_lang = get_string("settings_s3_region", "local_alternative_file_system", $a);
+                $a->settings_s3_credentials_key_lang =
+                    get_string("settings_s3_credentials_key", "local_alternative_file_system", $a);
+                $a->settings_s3_credentials_secret_lang =
+                    get_string("settings_s3_credentials_secret", "local_alternative_file_system", $a);
+                $a->settings_bucketname_lang = get_string("settings_bucketname", "local_alternative_file_system", $a);
+                $a->settings_path_lang = get_string("settings_path", "local_alternative_file_system", $a);
+            } else if ($CFG->alternative_file_system_class == '\tool_objectfs\s3_file_system') {
                 $a->settings_local = $a->local = "Amazon S3";
                 $a->settings_s3_region = get_config("tool_objectfs", "s3_region");
                 $a->settings_s3_credentials_key = get_config("tool_objectfs", "s3_key");
@@ -69,12 +72,14 @@ if ($hassiteconfig) {
                 $a->settings_bucketname = get_config("tool_objectfs", "s3_bucket");
                 $a->settings_path = get_config("tool_objectfs", "s3_keyprefix");
 
-                $a->settings_local_lang =  get_string("settings_destino", "local_alternative_file_system");
-                $a->settings_s3_region_lang =  get_string("settings_s3_region", "local_alternative_file_system", $a);
-                $a->settings_s3_credentials_key_lang =  get_string("settings_s3_credentials_key", "local_alternative_file_system", $a);
-                $a->settings_s3_credentials_secret_lang =  get_string("settings_s3_credentials_secret", "local_alternative_file_system", $a);
-                $a->settings_bucketname_lang =  get_string("settings_bucketname", "local_alternative_file_system", $a);
-                $a->settings_path_lang =  get_string("settings_path", "local_alternative_file_system", $a);
+                $a->settings_local_lang = get_string("settings_destino", "local_alternative_file_system");
+                $a->settings_s3_region_lang = get_string("settings_s3_region", "local_alternative_file_system", $a);
+                $a->settings_s3_credentials_key_lang =
+                    get_string("settings_s3_credentials_key", "local_alternative_file_system", $a);
+                $a->settings_s3_credentials_secret_lang =
+                    get_string("settings_s3_credentials_secret", "local_alternative_file_system", $a);
+                $a->settings_bucketname_lang = get_string("settings_bucketname", "local_alternative_file_system", $a);
+                $a->settings_path_lang = get_string("settings_path", "local_alternative_file_system", $a);
             }
 
             if (!isset($config->settings_local[3])) {
@@ -98,11 +103,13 @@ if ($hassiteconfig) {
 
             $msg = get_string("settings_objectfs_notice", "local_alternative_file_system", $a);
 
-            $settings->add(new admin_setting_heading(
-                'local_alternative_file_system/objectfs_notice',
-                '',
-                $PAGE->get_renderer("core")->render(new notification($msg, notification::NOTIFY_INFO, false))
-            ));
+            $settings->add(
+                new admin_setting_heading(
+                    'local_alternative_file_system/objectfs_notice',
+                    '',
+                    $PAGE->get_renderer("core")->render(new notification($msg, notification::NOTIFY_INFO, false))
+                )
+            );
         }
     }
 
@@ -116,13 +123,15 @@ if ($hassiteconfig) {
             $settingsdestinos[] = ["gcs" => "Google Cloud Storage"];
         }
 
-        $settings->add(new admin_setting_configselect(
-            "local_alternative_file_system/settings_destino",
-            get_string("settings_destino", "local_alternative_file_system"),
-            get_string("settings_destinodesc", "local_alternative_file_system"),
-            "",
-            $settingsdestinos
-        ));
+        $settings->add(
+            new admin_setting_configselect(
+                "local_alternative_file_system/settings_destino",
+                get_string("settings_destino", "local_alternative_file_system"),
+                get_string("settings_destinodesc", "local_alternative_file_system"),
+                "",
+                $settingsdestinos
+            )
+        );
         $PAGE->requires->js_call_amd("local_alternative_file_system/settings", "init");
 
         $datalang = [
@@ -142,8 +151,10 @@ if ($hassiteconfig) {
                 $s3filesystem->test_config();
 
                 $string = get_string("settings_success", "local_alternative_file_system");
-                $setting = new admin_setting_heading("local_alternative_file_system/header1", "",
-                    $PAGE->get_renderer("core")->render(new notification($string, notification::NOTIFY_SUCCESS, false)));
+                $setting = new admin_setting_heading(
+                    "local_alternative_file_system/header1", "",
+                    $PAGE->get_renderer("core")->render(new notification($string, notification::NOTIFY_SUCCESS, false))
+                );
                 $settings->add($setting);
 
                 $missingcount = $s3filesystem->missing_count();
@@ -156,7 +167,8 @@ if ($hassiteconfig) {
                     $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
                     $string2 = get_string("settings_migrate_remote", "local_alternative_file_system", $datalang);
                     $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
-                    $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
+                    $setting = new admin_setting_heading(
+                        "local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
                         $PAGE->get_renderer("core")->render(
                             new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false)
@@ -165,15 +177,19 @@ if ($hassiteconfig) {
                     $settings->add($setting);
                 } else {
                     $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
-                    $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
-                        $PAGE->get_renderer("core")->render(new notification($string3, notification::NOTIFY_INFO, false)));
+                    $setting = new admin_setting_heading(
+                        "local_alternative_file_system/header2", "",
+                        $PAGE->get_renderer("core")->render(new notification($string3, notification::NOTIFY_INFO, false))
+                    );
                     $settings->add($setting);
                 }
 
             } catch (Exception $e) {
-                $setting = new admin_setting_heading("local_alternative_file_system/header3",
+                $setting = new admin_setting_heading(
+                    "local_alternative_file_system/header3",
                     "",
-                    $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR)));
+                    $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR))
+                );
                 $settings->add($setting);
             }
 
@@ -181,35 +197,40 @@ if ($hassiteconfig) {
                 "local_alternative_file_system/settings_s3_region",
                 get_string("settings_s3_region", "local_alternative_file_system", $datalang),
                 get_string("settings_s3_regiondesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
 
             $setting = new admin_setting_configtext(
                 "local_alternative_file_system/settings_s3_credentials_key",
                 get_string("settings_s3_credentials_key", "local_alternative_file_system", $datalang),
                 get_string("settings_s3_credentials_keydesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
 
             $setting = new admin_setting_configtext(
                 "local_alternative_file_system/settings_s3_credentials_secret",
                 get_string("settings_s3_credentials_secret", "local_alternative_file_system", $datalang),
                 get_string("settings_s3_credentials_secretdesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
 
             $setting = new admin_setting_configtext(
                 "local_alternative_file_system/settings_s3_bucketname",
                 get_string("settings_bucketname", "local_alternative_file_system", $datalang),
                 get_string("settings_bucketnamedesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
 
             $setting = new admin_setting_configtext(
                 "local_alternative_file_system/settings_path",
                 get_string("settings_path", "local_alternative_file_system", $datalang),
                 get_string("settings_pathdesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
         }
         if ($config->settings_destino == "gcs") {
@@ -219,8 +240,10 @@ if ($hassiteconfig) {
                 $gcsfilesystem->test_config();
 
                 $string = get_string("settings_success", "local_alternative_file_system");
-                $setting = new admin_setting_heading("local_alternative_file_system/header1", "",
-                    $PAGE->get_renderer("core")->render(new notification($string, notification::NOTIFY_SUCCESS, false)));
+                $setting = new admin_setting_heading(
+                    "local_alternative_file_system/header1", "",
+                    $PAGE->get_renderer("core")->render(new notification($string, notification::NOTIFY_SUCCESS, false))
+                );
                 $settings->add($setting);
 
                 if ($gcsfilesystem->missing_count()) {
@@ -231,7 +254,8 @@ if ($hassiteconfig) {
                     $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
                     $string2 = get_string("settings_migrate_remote", "local_alternative_file_system", $datalang);
                     $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
-                    $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
+                    $setting = new admin_setting_heading(
+                        "local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
                         $PAGE->get_renderer("core")->render(
                             new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false)
@@ -244,15 +268,19 @@ if ($hassiteconfig) {
                         "sending" => number_format($gcsfilesystem->sending_count(), 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
-                    $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
-                        $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_SUCCESS, false)));
+                    $setting = new admin_setting_heading(
+                        "local_alternative_file_system/header2", "",
+                        $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_SUCCESS, false))
+                    );
                     $settings->add($setting);
                 }
 
             } catch (Exception $e) {
-                $setting = new admin_setting_heading("local_alternative_file_system/header3",
+                $setting = new admin_setting_heading(
+                    "local_alternative_file_system/header3",
                     "",
-                    $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR)));
+                    $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR))
+                );
                 $settings->add($setting);
             }
 
@@ -260,28 +288,33 @@ if ($hassiteconfig) {
                 "local_alternative_file_system/settings_gcs_keyfile",
                 get_string("settings_gcs_keyfile", "local_alternative_file_system", $datalang),
                 get_string("settings_gcs_keyfiledesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
 
             $setting = new admin_setting_configtext(
                 "local_alternative_file_system/settings_gcs_bucketname",
                 get_string("settings_bucketname", "local_alternative_file_system", $datalang),
                 get_string("settings_bucketnamedesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
 
             $setting = new admin_setting_configtext(
                 "local_alternative_file_system/settings_path",
                 get_string("settings_path", "local_alternative_file_system", $datalang),
                 get_string("settings_pathdesc", "local_alternative_file_system", $datalang),
-                "", PARAM_TEXT);
+                "", PARAM_TEXT
+            );
             $settings->add($setting);
         }
 
     } else {
-        $setting = new admin_setting_heading("local_alternative_file_system/header4",
+        $setting = new admin_setting_heading(
+            "local_alternative_file_system/header4",
             get_string("instruction_title", "local_alternative_file_system"),
-            get_string("instruction_install", "local_alternative_file_system"));
+            get_string("instruction_install", "local_alternative_file_system")
+        );
         $settings->add($setting);
     }
 }
