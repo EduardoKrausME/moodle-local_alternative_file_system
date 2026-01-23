@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['instruction_install'] = '<p><strong>Add the line below to the Moodle <code>config.php</code> file:</strong></p><pre><code>$CFG->alternative_file_system_class = \'\local_alternative_file_system\external_file_system\';</code></pre><p><strong>Important:</strong> Insert this line <strong>before</strong> the following line, if it exists in your file:</p><pre><code>require_once(__DIR__ . \'/lib/setup.php\');</code></pre>';
+$string['instruction_install'] = '<p><strong>Add the line below to the Moodle <code>config.php</code> file:</strong></p><pre><code>$CFG->alternative_file_system_class = \'\local_alternative_file_system\external_file_system\';</code></pre><p><strong>Important:</strong> insert this line <strong>before</strong> the line below (if it exists in your file):</p><pre><code>require_once(__DIR__ . \'/lib/setup.php\');</code></pre>';
 $string['instruction_title'] = 'Installation Instructions';
 $string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Execute Now (may take a long time)</a></p>';
 $string['migrate_title'] = 'Migrate local storage to remote storage';
@@ -62,16 +62,16 @@ $string['eta'] = 'ETA: <strong>{$a}</strong>';
 $string['bytesline'] = 'Bytes: <strong>{$a->migrated}</strong> / <strong>{$a->total}</strong> &nbsp;|&nbsp; Rate (10m): <strong>{$a->rate}/min</strong> &nbsp;|&nbsp; ETA (bytes): <strong>{$a->eta}</strong>';
 $string['bytescalcfailed'] = 'Failed to calculate bytes (fast=0 mode). Reason: {$a}';
 $string['settings_objectfs_notice'] = '
-<p><strong>Current Alternative File System:</strong> <code>{$a->currentclass}</code></p>
-<p>This site is currently using <strong>tool_objectfs</strong> as the Moodle alternative file system. While this is enabled, the scheduled task
-<strong>"Migrate objects from tool_objectfs to Alternative File System"</strong> will copy each object from the current DigitalOcean Spaces
-(ObjectFS) to the destination configured in this plugin (S3/Spaces/GCS).</p>
-<p><strong>How the transfer works</strong></p>
+<p>Currently, <code>$CFG->alternative_file_system_class</code> is set to <code>\'{$a->currentclass}\';</code> and this means that this site is currently using <strong>tool_objectfs</strong> as Moodle’s alternative file system.</p>
+
+<p>To use the same settings and not lose any files, use the following settings in this plugin:</p>
 <ul>
-  <li>Moodle continues reading/writing using <strong>tool_objectfs</strong>.</li>
-  <li>CRON copies the objects in the background to the destination configured in <strong>local_alternative_file_system</strong>.</li>
-  <li>You can monitor progress in {$a->reportlink}.</li>
+  <li><strong>{$a->settings_local_lang}</strong>: <code>{$a->settings_local}</code></li>
+  <li><strong>{$a->settings_s3_region_lang}</strong>: <code>{$a->settings_s3_region}</code></li>
+  <li><strong>{$a->settings_s3_credentials_key_lang}</strong>: <code>{$a->settings_s3_credentials_key}</code></li>
+  <li><strong>{$a->settings_s3_credentials_secret_lang}</strong>: <code>{$a->settings_s3_credentials_secret}</code></li>
+  <li><strong>{$a->settings_bucketname_lang}</strong>: <code>{$a->settings_bucketname}</code></li>
+  <li><strong>{$a->settings_path_lang}</strong>: <code>{$a->settings_path}</code></li>
 </ul>
-<p><strong>When the report shows that the migration is finished</strong> (no missing items / 100% completed), update your Moodle <code>config.php</code> and switch the alternative file system class to:</p>
-<pre><code>$CFG->alternative_file_system_class = \'\\local_alternative_file_system\\external_file_system\';</code></pre>
-<p><strong>Important:</strong> after switching, keep monitoring {$a->reportlink} for a while to ensure there is no new backlog.</p>';
+
+<p>Then, first you need to change the value in <code>config.php</code> to <code>$CFG->alternative_file_system_class = \'\local_alternative_file_system\external_file_system\';</code> in order to use this plugin as the alternative file system.</p>';
