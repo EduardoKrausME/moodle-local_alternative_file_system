@@ -27,8 +27,6 @@ use local_alternative_file_system\storages\s3\S3;
 use local_alternative_file_system\storages\s3\s3_file_system;
 use local_alternative_file_system\storages\storage_file_system;
 
-define('OPEN_INTERNAL', true);
-
 global $CFG, $DB, $OUTPUT, $PAGE;
 
 require_once("../../config.php");
