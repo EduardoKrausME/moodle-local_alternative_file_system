@@ -92,13 +92,13 @@ class s3_file_system extends storage_file_system implements i_file_system {
     }
 
     /**
-     * Function getAuthenticatedURL
+     * Function get_authenticated_url
      *
      * @param $objectkey
      * @param $lifetime
      * @return string
      */
-    public function getAuthenticatedURL($objectkey, $lifetime) {
+    public function get_authenticated_url($objectkey, $lifetime) {
         return S3::getAuthenticatedURL($this->config->settings_s3_bucketname, $objectkey, $lifetime);
     }
 

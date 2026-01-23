@@ -79,7 +79,7 @@ if (optional_param("execute", false, PARAM_INT)) {
             $url = $externalfilesystem->get_remote_path_from_hash($file->contenthash);
 
             $objectkey = $s3filesystem->get_local_path_from_hash($file->contenthash);
-            $link = $s3filesystem->getAuthenticatedURL($objectkey, time() + 4800);
+            $link = $s3filesystem->get_authenticated_url($objectkey, time() + 4800);
             @mkdir("{$CFG->dataroot}/filedir/{$a1}/{$a2}", 0777, true);
             $fp = fopen($localfile, 'wb');
 
