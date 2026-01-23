@@ -264,7 +264,7 @@ class storage_file_system extends file_system {
 
         $sql = "
             SELECT COUNT( DISTINCT contenthash ) AS num_files
-              FROM mdl_files
+              FROM {files}
              WHERE filename <> '.'
                AND mimetype IS NOT NULL";
         $result = $DB->get_record_sql($sql);
