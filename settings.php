@@ -146,19 +146,21 @@ if ($hassiteconfig) {
                     $PAGE->get_renderer("core")->render(new notification($string, notification::NOTIFY_SUCCESS, false)));
                 $settings->add($setting);
 
-                $missing_count = $s3filesystem->missing_count();
-                $sending_count = $s3filesystem->sending_count();
-                if ($missing_count != $sending_count) {
+                $missingcount = $s3filesystem->missing_count();
+                $sendingcount = $s3filesystem->sending_count();
+                if ($missingcount != $sendingcount) {
                     $a = [
-                        "missing" => number_format($missing_count, 0, $decsep, $thousandssep),
-                        "sending" => number_format($sending_count, 0, $decsep, $thousandssep),
+                        "missing" => number_format($missingcount, 0, $decsep, $thousandssep),
+                        "sending" => number_format($sendingcount, 0, $decsep, $thousandssep),
                     ];
                     $string1 = get_string("migrate_total", "local_alternative_file_system", $a);
                     $string2 = get_string("settings_migrate_remote", "local_alternative_file_system", $datalang);
                     $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
                     $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
-                        $PAGE->get_renderer("core")->render(new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false))
+                        $PAGE->get_renderer("core")->render(
+                            new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false)
+                        )
                     );
                     $settings->add($setting);
                 } else {
@@ -231,7 +233,9 @@ if ($hassiteconfig) {
                     $string3 = get_string("settings_migrate_local", "local_alternative_file_system", $datalang);
                     $setting = new admin_setting_heading("local_alternative_file_system/header2", "",
                         $PAGE->get_renderer("core")->render(new notification($string1, notification::NOTIFY_WARNING, false)) .
-                        $PAGE->get_renderer("core")->render(new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false))
+                        $PAGE->get_renderer("core")->render(
+                            new notification("{$string2}<br>{$string3}", notification::NOTIFY_INFO, false)
+                        )
                     );
                     $settings->add($setting);
                 } else {
