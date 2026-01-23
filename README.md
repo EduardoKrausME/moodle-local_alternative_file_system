@@ -7,15 +7,6 @@ Currently supported:
 * **AWS S3**
 * **DigitalOcean Spaces**
 
-## Why use cloud storage with Moodle
-
-By moving `filedir` to remote storage (S3/Spaces), you gain:
-
-* **Scalability** (server disk is no longer a bottleneck)
-* **Resilience/durability** of storage
-* **Performance** via CDN (when applicable)
-* **Simpler cluster operation** (webheads without shared disks)
-
 ## Advantages of using cloud storage instead of local files in Moodle
 
 By moving files to remote storage (such as AWS S3 or DigitalOcean Spaces), you gain several advantages compared to keeping them locally.
