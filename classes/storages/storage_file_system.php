@@ -238,8 +238,8 @@ class storage_file_system extends file_system {
 
         $sql = "SELECT COUNT(*) AS num_files
                   FROM {local_alternativefilesystemf}
-                 WHERE storage = '{$config->settings_destino}'";
-        $result = $DB->get_record_sql($sql);
+                 WHERE storage = :storage";
+        $result = $DB->get_record_sql($sql, ["storage" => $config->settings_destino]);
         return $result->num_files;
     }
 

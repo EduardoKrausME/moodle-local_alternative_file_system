@@ -56,11 +56,11 @@ if (optional_param("execute", false, PARAM_INT)) {
              WHERE contenthash NOT IN (
                     SELECT contenthash
                       FROM {local_alternativefilesystemf}
-                     WHERE storage = '{$config->settings_destino}'
+                     WHERE storage = :storage
                  )
                AND filename <> '.'
                AND mimetype IS NOT NULL";
-    $files = $DB->get_recordset_sql($sql);
+    $files = $DB->get_recordset_sql($sql, ["storage" => $config->settings_destino]);
     /** @var object $file */
     foreach ($files as $file) {
         $remotefilename = $externalfilesystem->get_local_path_from_hash($file->contenthash);
