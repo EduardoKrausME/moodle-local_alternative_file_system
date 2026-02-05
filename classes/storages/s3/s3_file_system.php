@@ -119,7 +119,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false, $localfile = true) {
         $uri = $this->get_local_path_from_hash($contenthash);
-        $lifetime = time() + 604800;
+        $lifetime = 604800;
         $url = S3::getAuthenticatedURL($this->config->settings_s3_bucketname, $uri, $lifetime, false, true);
 
         if (strpos((new Exception())->getTraceAsString(), "mod/scorm")) {
