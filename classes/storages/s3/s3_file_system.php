@@ -16,6 +16,7 @@
 
 namespace local_alternative_file_system\storages\s3;
 
+use core\exception\moodle_exception;
 use Exception;
 use local_alternative_file_system\i_file_system;
 use local_alternative_file_system\storages\storage_file_system;
@@ -45,8 +46,17 @@ class s3_file_system extends storage_file_system implements i_file_system {
     public function test_config() {
         global $CFG;
 
-        if (!isset($this->config->settings_path)) {
-            return null;
+        $campos = [
+            'storage_destination' => $this->config->storage_destination,
+            'settings_s3_region' => $this->config->settings_s3_region,
+            'settings_s3_credentials_key' => $this->config->settings_s3_credentials_key,
+            'settings_s3_credentials_secret' => $this->config->settings_s3_credentials_secret,
+            'settings_s3_bucketname' => $this->config->settings_s3_bucketname,
+        ];
+        foreach ($campos as $valor) {
+            if ($valor === null || (is_string($valor) && trim($valor) === '') || $valor === '') {
+                throw new Exception("settings_empty");
+            }
         }
 
         $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $this->config->settings_path);
@@ -77,15 +87,38 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         $this->config = get_config("local_alternative_file_system");
 
-        if (!isset($this->config->settings_destino)) {
-            return null;
+        $campos = [
+            'storage_destination' => $this->config->storage_destination,
+            'settings_s3_region' => $this->config->settings_s3_region,
+            'settings_s3_credentials_key' => $this->config->settings_s3_credentials_key,
+            'settings_s3_credentials_secret' => $this->config->settings_s3_credentials_secret,
+            'settings_s3_bucketname' => $this->config->settings_s3_bucketname,
+        ];
+        foreach ($campos as $valor) {
+            if ($valor === null || (is_string($valor) && trim($valor) === '') || $valor === '') {
+                return null;
+            }
         }
 
         $endpoint = "";
-        if ($this->config->settings_destino == "s3") {
+        if ($this->config->storage_destination == "s3") {
             $endpoint = "s3.{$this->config->settings_s3_region}.amazonaws.com";
-        } else if ($this->config->settings_destino == "space") {
+        } else if ($this->config->storage_destination == "space") {
             $endpoint = "{$this->config->settings_s3_region}.digitaloceanspaces.com";
+        } else if ($this->config->storage_destination == "s3generic") {
+            $endpoint = get_config("local_alternative_file_system", "settings_s3generic_endpoint");
+            if (preg_match('#^https?://#i', $endpoint)) {
+                $u = parse_url($endpoint);
+                $newendpoint = $u["host"];
+                if (!empty($u["port"])) {
+                    $newendpoint = "{$u["host"]}:{$u["port"]}";
+                }
+
+                if ($newendpoint != $endpoint) {
+                    set_config("settings_s3generic_endpoint", $newendpoint, "local_alternative_file_system");
+                    $endpoint = $newendpoint;
+                }
+            }
         }
 
         S3::setConfig($this->config->settings_s3_credentials_key, $this->config->settings_s3_credentials_secret, $endpoint);
@@ -198,7 +231,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
         // Remove tracking row only for this storage.
         $DB->delete_records('local_alternativefilesystemf', [
             'contenthash' => $contenthash,
-            'storage' => $this->config->settings_destino,
+            'storage' => $this->config->storage_destination,
         ]);
 
         return true;

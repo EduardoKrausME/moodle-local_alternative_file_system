@@ -60,13 +60,13 @@ By choosing remote storage instead of Moodle’s local storage, you benefit from
 After installing the plugin, you must edit the `config.php` file and include the following line **before** the call to `require_once( __DIR__ . '/lib/setup.php' );`.
 
 ```php
-$CFG->alternative_file_system_class = "\\local_alternative_file_system\\external_file_system";
+$CFG->alternative_file_system_class = '\local_alternative_file_system\external_file_system';
 ```
 
 So it becomes:
 
 ```php
-$CFG->alternative_file_system_class = "\\local_alternative_file_system\\external_file_system";
+$CFG->alternative_file_system_class = '\local_alternative_file_system\external_file_system';
 
 require_once( __DIR__ . '/lib/setup.php' );
 ```

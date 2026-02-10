@@ -60,7 +60,7 @@ if (optional_param("execute", false, PARAM_INT)) {
                  )
                AND filename <> '.'
                AND mimetype IS NOT NULL";
-    $files = $DB->get_recordset_sql($sql, ["storage" => $config->settings_destino]);
+    $files = $DB->get_recordset_sql($sql, ["storage" => $config->storage_destination]);
     /** @var object $file */
     foreach ($files as $file) {
         $remotefilename = $externalfilesystem->get_local_path_from_hash($file->contenthash);

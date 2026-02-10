@@ -213,7 +213,7 @@ class storage_file_system extends file_system {
 
         $data = [
             "contenthash" => $contenthash,
-            "storage" => $config->settings_destino,
+            "storage" => $config->storage_destination,
             "timemodifield" => time(),
         ];
         try {
@@ -239,7 +239,7 @@ class storage_file_system extends file_system {
         $sql = "SELECT COUNT(*) AS num_files
                   FROM {local_alternativefilesystemf}
                  WHERE storage = :storage";
-        $result = $DB->get_record_sql($sql, ["storage" => $config->settings_destino]);
+        $result = $DB->get_record_sql($sql, ["storage" => $config->storage_destination]);
         return $result->num_files;
     }
 
@@ -255,7 +255,7 @@ class storage_file_system extends file_system {
 
         $config = get_config("local_alternative_file_system");
         $cache = cache::make("local_alternative_file_system", "missing_count");
-        $cachekey = "destino_{$config->settings_destino}";
+        $cachekey = "destino_{$config->storage_destination}";
 
         $cached = $cache->get($cachekey);
         if ($cached !== false) {

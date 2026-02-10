@@ -36,8 +36,6 @@ $string['pluginname'] = 'Alternative File System';
 $string['privacy:no_data_reason'] = 'The Alternative File System plugin does not store any personal data.';
 $string['settings_bucketname'] = '{$a->local} Bucket Name';
 $string['settings_bucketnamedesc'] = 'The unique name assigned to the bucket in {$a->local}.';
-$string['settings_destino'] = 'Storage Destination';
-$string['settings_destinodesc'] = 'Choose the storage destination and save to load storage-related data.';
 $string['settings_gcs_keyfile'] = 'Google-storage.json Content';
 $string['settings_gcs_keyfiledesc'] = 'Paste here the content of the "google-storage.json" file.';
 $string['settings_local'] = 'Local files in Moodle';
@@ -51,7 +49,15 @@ $string['settings_s3_credentials_secret'] = '{$a->local} Secret Key';
 $string['settings_s3_credentials_secretdesc'] = 'The secret key used to authenticate with the {$a->local} service.';
 $string['settings_s3_region'] = '{$a->local} Region';
 $string['settings_s3_regiondesc'] = 'The region where the {$a->local} bucket is located, for example, "{$a->ex_region}".';
-$string['settings_success'] = '<h2>Data is correct.</h2>Please be cautious when modifying settings, as any incorrect changes can result in inaccessibility of stored files.';
+
+$string['settings_s3generic_destino'] = 'Generic S3 (custom endpoint)';
+$string['settings_s3generic_endpoint'] = 'S3 endpoint URL';
+$string['settings_s3generic_endpoint_desc'] = 'The endpoint is the base address of your S3 service (an S3-compatible provider). You can enter it without <code>https://</code> and with or without the port. Do not include bucket names, nor only the service host (and port, if needed).<blockquote>Examples: <code>https://s3.eu-central-1.amazonaws.com</code>, <code>o000.idrivee.com</code> or <code>minio:9000</code>.<br>Do NOT use: <code><strong style="color:#673AB7;text-decoration:underline;">mybucket.</strong>s3.amazonaws.com</code> or <code>server:9000<strong style="color:#673AB7;text-decoration:underline;">/mybucket</strong></code>.</blockquote>';
+
+
+$string['settings_success'] = '<strong>Data is correct.</strong><br>Please be cautious when modifying settings, as any incorrect changes can result in inaccessibility of stored files.';
+$string['storage_destination'] = 'Storage Destination';
+$string['storage_destinationdesc'] = 'Choose the storage destination and save to load storage-related data.';
 $string['reporttitle_status'] = 'Status';
 $string['nostoragefound'] = 'No storage found to report. Check if the table local_alternativefilesystemf has records.';
 $string['totalfiles'] = 'Total files in MDL_FILES: <strong>{$a}</strong>';

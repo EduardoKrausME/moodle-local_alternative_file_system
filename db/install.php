@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 function xmldb_local_alternative_file_system_install() {
-    set_config("settings_destino", "", "local_alternative_file_system");
+    set_config("storage_destination", "", "local_alternative_file_system");
 
     return true;
 }
