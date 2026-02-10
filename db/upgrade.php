@@ -95,5 +95,12 @@ function xmldb_local_alternative_file_system_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026011400, 'local', 'alternative_file_system');
     }
 
+    if ($oldversion < 2026021000) {
+        $destination = get_config("local_alternative_file_system", "settings_destino");
+        set_config("storage_destination", $destination, "local_alternative_file_system");
+
+        upgrade_plugin_savepoint(true, 2026021000, 'local', 'alternative_file_system');
+    }
+
     return true;
 }
