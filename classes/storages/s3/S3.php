@@ -77,6 +77,15 @@ class S3 {
     public static $endpoint = 's3.amazonaws.com';
 
     /**
+     * AWS Region (required for Signature Version 4)
+     *
+     * @var string
+     * @access public
+     * @static
+     */
+    public static $region = 'us-east-1';
+
+    /**
      * Proxy information
      *
      * @var null|array
@@ -167,14 +176,16 @@ class S3 {
      * @param string $accessKey Access key
      * @param string $secretKey Secret key
      * @param string $endpoint  Amazon URI
+     * @param string $region    AWS Region (required for Signature Version 4)
      *
      * @return void
      */
-    public static function setConfig($accessKey = null, $secretKey = null, $endpoint = 's3.amazonaws.com') {
+    public static function setConfig($accessKey = null, $secretKey = null, $endpoint = 's3.amazonaws.com', $region = 'us-east-1') {
         if ($accessKey !== null && $secretKey !== null) {
             self::setAuth($accessKey, $secretKey);
         }
         self::$endpoint = $endpoint;
+        self::$region = $region;
     }
 
     /**
@@ -1060,7 +1071,7 @@ class S3 {
     }
 
     /**
-     * Get a query string authenticated URL
+     * Get a query string authenticated URL (Signature Version 4 pre-signed URL)
      *
      * @param string $bucket      Bucket name
      * @param string $uri         Object URI
@@ -1071,12 +1082,73 @@ class S3 {
      * @return string
      */
     public static function getAuthenticatedURL($bucket, $uri, $lifetime, $hostBucket = false, $https = false) {
-        $expires = self::__getTime() + $lifetime;
+        $datetime = gmdate('Ymd\THis\Z', self::__getTime());
+        $date = substr($datetime, 0, 8);
+        $region = self::$region;
+        $credentialScope = $date . '/' . $region . '/s3/aws4_request';
+
         $uri = str_replace(array('%2F', '%2B'), array('/', '+'), rawurlencode($uri));
-        return sprintf(($https ? 'https' : 'http') . '://%s/%s?AWSAccessKeyId=%s&Expires=%u&Signature=%s',
-            // $hostBucket ? $bucket : $bucket.'.s3.amazonaws.com', $uri, self::$__accessKey, $expires,
-            $hostBucket ? $bucket : self::$endpoint . '/' . $bucket, $uri, self::$__accessKey, $expires,
-            urlencode(self::__getHash("GET\n\n\n{$expires}\n/{$bucket}/{$uri}")));
+
+        if ($hostBucket) {
+            $hostname = $bucket;
+            $canonicalUri = '/' . $uri;
+        } else {
+            $hostname = self::$endpoint;
+            $canonicalUri = '/' . $bucket . '/' . $uri;
+        }
+
+        $queryParams = [
+            'X-Amz-Algorithm'     => 'AWS4-HMAC-SHA256',
+            'X-Amz-Credential'    => self::$__accessKey . '/' . $credentialScope,
+            'X-Amz-Date'          => $datetime,
+            'X-Amz-Expires'       => (string)$lifetime,
+            'X-Amz-SignedHeaders' => 'host',
+        ];
+        ksort($queryParams);
+
+        $canonQueryParts = [];
+        foreach ($queryParams as $k => $v) {
+            $canonQueryParts[] = rawurlencode($k) . '=' . rawurlencode($v);
+        }
+        $canonicalQueryString = implode('&', $canonQueryParts);
+
+        $canonicalRequest = implode("\n", [
+            'GET',
+            $canonicalUri,
+            $canonicalQueryString,
+            'host:' . $hostname . "\n",
+            'host',
+            'UNSIGNED-PAYLOAD',
+        ]);
+
+        $stringToSign = implode("\n", [
+            'AWS4-HMAC-SHA256',
+            $datetime,
+            $credentialScope,
+            hash('sha256', $canonicalRequest),
+        ]);
+
+        $signingKey = self::__hmacSha256Raw(
+            self::__hmacSha256Raw(
+                self::__hmacSha256Raw(
+                    self::__hmacSha256Raw('AWS4' . self::$__secretKey, $date),
+                    $region
+                ),
+                's3'
+            ),
+            'aws4_request'
+        );
+
+        $signature = hash_hmac('sha256', $stringToSign, $signingKey);
+
+        $queryParams['X-Amz-Signature'] = $signature;
+
+        $queryParts = [];
+        foreach ($queryParams as $k => $v) {
+            $queryParts[] = rawurlencode($k) . '=' . rawurlencode($v);
+        }
+
+        return ($https ? 'https' : 'http') . '://' . $hostname . $canonicalUri . '?' . implode('&', $queryParts);
     }
 
     /**
@@ -1703,35 +1775,72 @@ class S3 {
     }
 
     /**
-     * Generate the auth string: "AWS AccessKey:Signature"
+     * Generate the AWS Signature Version 4 Authorization header value.
      *
      * @internal Used by S3Request::getResponse()
      *
-     * @param string $string String to sign
+     * @param string $verb                  HTTP method
+     * @param string $canonicalUri          URL-encoded path (no query string)
+     * @param string $canonicalQueryString  Sorted, encoded query string
+     * @param string $canonicalHeaders      Canonical headers string (each "key:value\n")
+     * @param string $signedHeaders         Semicolon-delimited list of signed header names
+     * @param string $payloadHash           SHA-256 hex hash of the payload (or "UNSIGNED-PAYLOAD")
+     * @param string $datetime              ISO8601 datetime string (e.g. "20240115T123456Z")
      *
      * @return string
      */
-    public static function __getSignature($string) {
-        return 'AWS ' . self::$__accessKey . ':' . self::__getHash($string);
+    public static function __getSignatureV4($verb, $canonicalUri, $canonicalQueryString,
+                                             $canonicalHeaders, $signedHeaders, $payloadHash, $datetime) {
+        $date = substr($datetime, 0, 8);
+        $region = self::$region;
+        $credentialScope = $date . '/' . $region . '/s3/aws4_request';
+
+        $canonicalRequest = implode("\n", [
+            $verb,
+            $canonicalUri,
+            $canonicalQueryString,
+            $canonicalHeaders,
+            $signedHeaders,
+            $payloadHash,
+        ]);
+
+        $stringToSign = implode("\n", [
+            'AWS4-HMAC-SHA256',
+            $datetime,
+            $credentialScope,
+            hash('sha256', $canonicalRequest),
+        ]);
+
+        $signingKey = self::__hmacSha256Raw(
+            self::__hmacSha256Raw(
+                self::__hmacSha256Raw(
+                    self::__hmacSha256Raw('AWS4' . self::$__secretKey, $date),
+                    $region
+                ),
+                's3'
+            ),
+            'aws4_request'
+        );
+
+        $signature = hash_hmac('sha256', $stringToSign, $signingKey);
+
+        return 'AWS4-HMAC-SHA256 Credential=' . self::$__accessKey . '/' . $credentialScope
+            . ', SignedHeaders=' . $signedHeaders
+            . ', Signature=' . $signature;
     }
 
     /**
-     * Creates a HMAC-SHA1 hash
+     * Raw (binary) HMAC-SHA256
      *
-     * This uses the hash extension if loaded
+     * @internal Used by __getSignatureV4()
      *
-     * @internal Used by __getSignature()
-     *
-     * @param string $string String to sign
+     * @param string $key
+     * @param string $data
      *
      * @return string
      */
-    private static function __getHash($string) {
-        return base64_encode(extension_loaded('hash') ?
-            hash_hmac('sha1', $string, self::$__secretKey, true) : pack('H*', sha1(
-                (str_pad(self::$__secretKey, 64, chr(0x00)) ^ (str_repeat(chr(0x5c), 64))) .
-                pack('H*', sha1((str_pad(self::$__secretKey, 64, chr(0x00)) ^
-                        (str_repeat(chr(0x36), 64))) . $string)))));
+    private static function __hmacSha256Raw($key, $data) {
+        return hash_hmac('sha256', $data, $key, true);
     }
 
 }
