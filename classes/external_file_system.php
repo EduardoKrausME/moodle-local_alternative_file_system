@@ -16,7 +16,9 @@
 
 namespace local_alternative_file_system;
 
+use coding_exception;
 use Exception;
+use file_exception;
 use file_system;
 use file_system_filedir;
 use local_alternative_file_system\storages\gcs\gcs_file_system;
@@ -29,6 +31,17 @@ global $CFG;
 require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
 
 /**
+ * Minimum file size, in bytes, that triggers a local download before returning
+ * a file handle. Files below this size continue to use the default behaviour.
+ */
+if (!defined("LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE")) {
+    /**
+     *
+     */
+    define("LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE", 1048576);
+}
+
+/**
  * external_file_system file.
  *
  * @package    local_alternative_file_system
@@ -38,7 +51,7 @@ require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
 class external_file_system extends file_system implements i_file_system {
 
     /** @var s3_file_system */
-    private $filesysteminstance = null;
+    private $filesysteminstance;
 
     /**
      * external_file_system constructor.
@@ -207,6 +220,70 @@ class external_file_system extends file_system implements i_file_system {
      */
     public function get_imageinfo(stored_file $file) {
         return $this->filesysteminstance->get_imageinfo($file);
+    }
+
+    /**
+     * Returns file handle - read only mode, no writing allowed into pool files!
+     *
+     * When a consumer needs a seekable stream (for example requests using Range
+     * headers in the mobile app), a signed remote URL is not enough because
+     * functions like fseek() may fail. In those cases, download the file to a
+     * request-local path first and open the local copy.
+     *
+     * @param stored_file $file The file to retrieve a handle for
+     * @param int $type Type of file handle (FILE_HANDLE_xx constant)
+     * @return resource file handle
+     * @throws file_exception
+     * @throws coding_exception
+     */
+    public function get_content_file_handle(stored_file $file, $type = stored_file::FILE_HANDLE_FOPEN) {
+        if ($file->get_filesize() >= LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE) {
+            $localpath = $this->get_local_file_for_stored_file($file);
+            return self::get_file_handle_for_path($localpath, $type);
+        }
+
+        return parent::get_content_file_handle($file, $type);
+    }
+
+    /**
+     * Get a request-local file path for the specified stored file.
+     *
+     * If the file is already available in the standard filedir, reuse it.
+     * Otherwise download it from the configured remote backend to a path inside
+     * the current request directory.
+     *
+     * @param stored_file $file The file to get a local path for
+     * @return string The local file path
+     * @throws file_exception If the file cannot be retrieved
+     * @throws Exception
+     */
+    protected function get_local_file_for_stored_file(stored_file $file) {
+        global $CFG;
+
+        static $requestcache = [];
+
+        $contenthash = $file->get_contenthash();
+
+        $localpath = "{$CFG->dataroot}/filedir/" . substr($contenthash, 0, 2) . "/" .
+            substr($contenthash, 2, 2) . "/" . $contenthash;
+
+        if (is_readable($localpath)) {
+            return $localpath;
+        }
+
+        if (!empty($requestcache[$contenthash]) && is_readable($requestcache[$contenthash])) {
+            return $requestcache[$contenthash];
+        }
+
+        $requestdir = make_request_directory();
+        $temppath = "{$requestdir}/{$contenthash}";
+
+        if (!$this->copy_content_from_storedfile($file, $temppath)) {
+            throw new file_exception("storedfilecannotreadfile", $file->get_filename());
+        }
+
+        $requestcache[$contenthash] = $temppath;
+        return $temppath;
     }
 
     /**
