@@ -252,35 +252,106 @@ final class S3Request {
 
         // Headers
         $headers = [];
-        $amz = [];
-        foreach ($this->amzHeaders as $header => $value)
-            if (strlen($value) > 0) $headers[] = $header . ': ' . $value;
-        foreach ($this->headers as $header => $value)
-            if (strlen($value) > 0) $headers[] = $header . ': ' . $value;
-
-        // Collect AMZ headers for signature
-        foreach ($this->amzHeaders as $header => $value)
-            if (strlen($value) > 0) $amz[] = strtolower($header) . ':' . $value;
-
-        // AMZ headers must be sorted
-        if (sizeof($amz) > 0) {
-            //sort($amz);
-            usort($amz, array(&$this, '__sortMetaHeadersCmp'));
-            $amz = "\n" . implode("\n", $amz);
-        } else $amz = '';
 
         if (S3::hasAuth()) {
-            // Authorization string (CloudFront stringToSign should only contain a date)
-            if ($this->headers['Host'] == 'cloudfront.amazonaws.com')
-                $headers[] = 'Authorization: ' . S3::__getSignature($this->headers['Date']);
-            else {
-                $headers[] = 'Authorization: ' . S3::__getSignature(
-                        $this->verb . "\n" .
-                        $this->headers['Content-MD5'] . "\n" .
-                        $this->headers['Content-Type'] . "\n" .
-                        $this->headers['Date'] . $amz . "\n" .
-                        $this->resource
-                    );
+            $datetime = gmdate('Ymd\THis\Z', S3::__getTime());
+
+            // Payload hash: stream uploads use UNSIGNED-PAYLOAD (valid over HTTPS)
+            if ($this->fp !== false) {
+                $payloadHash = 'UNSIGNED-PAYLOAD';
+            } elseif ($this->data !== false) {
+                $payloadHash = hash('sha256', $this->data);
+            } else {
+                $payloadHash = hash('sha256', '');
+            }
+
+            // Build canonical header map from headers that will actually be sent.
+            $canonHeaderMap = ['host' => $this->headers['Host']];
+            foreach ($this->amzHeaders as $h => $v) {
+                if (strlen($v) > 0) {
+                    $canonHeaderMap[strtolower($h)] = trim($v);
+                }
+            }
+            foreach ($this->headers as $h => $v) {
+                $hlower = strtolower($h);
+                if (strlen($v) > 0 && $hlower !== 'host' && $hlower !== 'date') {
+                    $canonHeaderMap[$hlower] = trim($v);
+                }
+            }
+            $canonHeaderMap['x-amz-content-sha256'] = $payloadHash;
+            $canonHeaderMap['x-amz-date'] = $datetime;
+            ksort($canonHeaderMap);
+
+            $canonicalHeaders = '';
+            $signedHeadersList = [];
+            foreach ($canonHeaderMap as $h => $v) {
+                $canonicalHeaders .= $h . ':' . $v . "\n";
+                $signedHeadersList[] = $h;
+            }
+            $signedHeaders = implode(';', $signedHeadersList);
+
+            // Separate path from query string for the canonical request
+            $uriPath = $this->uri;
+            $queryPart = '';
+            if (strpos($this->uri, '?') !== false) {
+                list($uriPath, $queryPart) = explode('?', $this->uri, 2);
+            }
+            $canonicalQueryString = '';
+            if ($queryPart !== '') {
+                $pairs = explode('&', $queryPart);
+                $qparams = [];
+                foreach ($pairs as $pair) {
+                    if ($pair === '') {
+                        continue;
+                    }
+                    if (strpos($pair, '=') !== false) {
+                        list($k, $v) = explode('=', $pair, 2);
+                        $qparams[rawurldecode($k)] = rawurldecode($v);
+                    } else {
+                        $qparams[rawurldecode($pair)] = '';
+                    }
+                }
+                ksort($qparams);
+                $qparts = [];
+                foreach ($qparams as $k => $v) {
+                    $qparts[] = rawurlencode($k) . '=' . rawurlencode($v);
+                }
+                $canonicalQueryString = implode('&', $qparts);
+            }
+
+            // Build actual request header lines
+            foreach ($this->amzHeaders as $header => $value) {
+                if (strlen($value) > 0) {
+                    $headers[] = $header . ': ' . $value;
+                }
+            }
+            $headers[] = 'x-amz-date: ' . $datetime;
+            $headers[] = 'x-amz-content-sha256: ' . $payloadHash;
+            foreach ($this->headers as $header => $value) {
+                if (strlen($value) > 0 && strtolower($header) !== 'date') {
+                    $headers[] = $header . ': ' . $value;
+                }
+            }
+
+            $headers[] = 'Authorization: ' . S3::__getSignatureV4(
+                $this->verb,
+                $uriPath,
+                $canonicalQueryString,
+                $canonicalHeaders,
+                $signedHeaders,
+                $payloadHash,
+                $datetime
+            );
+        } else {
+            foreach ($this->amzHeaders as $header => $value) {
+                if (strlen($value) > 0) {
+                    $headers[] = $header . ': ' . $value;
+                }
+            }
+            foreach ($this->headers as $header => $value) {
+                if (strlen($value) > 0) {
+                    $headers[] = $header . ': ' . $value;
+                }
             }
         }
 

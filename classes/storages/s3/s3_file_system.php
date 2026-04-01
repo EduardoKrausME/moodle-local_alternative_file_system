@@ -121,7 +121,7 @@ class s3_file_system extends storage_file_system implements i_file_system {
             }
         }
 
-        S3::setConfig($this->config->settings_s3_credentials_key, $this->config->settings_s3_credentials_secret, $endpoint);
+        S3::setConfig($this->config->settings_s3_credentials_key, $this->config->settings_s3_credentials_secret, $endpoint, $this->config->settings_s3_region);
     }
 
     /**
