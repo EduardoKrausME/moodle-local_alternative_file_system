@@ -97,7 +97,7 @@ class storage_file_system extends file_system {
      * @throws file_exception
      * @throws Exception
      */
-    public function readfile(\stored_file $file) {
+    public function readfile(stored_file $file) {
         $url = $this->get_remote_path_from_hash($file->get_contenthash());
 
         if ($file->get_filesize() < 1000) {
@@ -137,7 +137,6 @@ class storage_file_system extends file_system {
      *
      * @return mixed array with width, height and mimetype; false if not an image
      *
-     * @throws \coding_exception
      * @throws Exception
      */
     public function get_imageinfo(stored_file $file) {
@@ -159,13 +158,11 @@ class storage_file_system extends file_system {
     }
 
     /**
-     * get_remote_file_size function.
+     * Function get_remote_file_size
      *
-     * @param string $contenthash
-     *
+     * @param $contenthash
      * @return int
-     *
-     * @throws Exception
+     * @throws dml_exception
      */
     public function get_remote_file_size($contenthash) {
 
@@ -198,13 +195,11 @@ class storage_file_system extends file_system {
     }
 
     /**
-     * report_save function.
+     * Function report_save
      *
-     * @param string $contenthash
-     *
+     * @param $contenthash
      * @return bool
-     *
-     * @throws dml_exception
+     * @throws Exception
      */
     public function report_save($contenthash) {
         global $DB;
@@ -218,10 +213,48 @@ class storage_file_system extends file_system {
         ];
         try {
             $DB->insert_record("local_alternativefilesystemf", $data);
+
+            $cache = cache::make("local_alternative_file_system", "missing_count");
+            $cache->delete("destino_{$config->storage_destination}");
+
             return true;
-        } catch (dml_exception $e) {
+        } catch (dml_exception) {
             return false;
         }
+    }
+
+    /**
+     * Function missing_count
+     *
+     * @return int
+     * @throws \core\exception\coding_exception
+     * @throws \dml_exception
+     */
+    public function missing_count() {
+        global $DB;
+
+        $config = get_config("local_alternative_file_system");
+        $cache = cache::make("local_alternative_file_system", "missing_count");
+        $cachekey = "destino_{$config->storage_destination}";
+
+        $cached = $cache->get($cachekey);
+        if ($cached !== false) {
+            return (int)$cached;
+        }
+
+        $sql = "SELECT COUNT(DISTINCT f.contenthash) AS num_files
+              FROM {files} f
+         LEFT JOIN {local_alternativefilesystemf} af
+                ON af.contenthash = f.contenthash
+               AND af.storage = :storage
+             WHERE f.filename <> '.'
+               AND f.mimetype IS NOT NULL
+               AND af.id IS NULL";
+
+        $result = $DB->get_record_sql($sql, ["storage" => $config->storage_destination]);
+        $cache->set($cachekey, $result->num_files);
+
+        return $result->num_files;
     }
 
     /**
@@ -244,35 +277,6 @@ class storage_file_system extends file_system {
     }
 
     /**
-     * Missing count function.
-     *
-     * @return int
-     *
-     * @throws Exception
-     */
-    public function missing_count() {
-        global $DB;
-
-        $config = get_config("local_alternative_file_system");
-        $cache = cache::make("local_alternative_file_system", "missing_count");
-        $cachekey = "destino_{$config->storage_destination}";
-
-        $cached = $cache->get($cachekey);
-        if ($cached !== false) {
-            return (int)$cached;
-        }
-
-        $sql = "
-            SELECT COUNT( DISTINCT contenthash ) AS num_files
-              FROM {files}
-             WHERE filename <> '.'
-               AND mimetype IS NOT NULL";
-        $result = $DB->get_record_sql($sql);
-        $cache->set($cachekey, $result->num_files);
-        return $result->num_files;
-    }
-
-    /**
      * Add file content to sha1 pool.
      *
      * @param string $pathname Path to file currently on disk
@@ -280,8 +284,6 @@ class storage_file_system extends file_system {
      *
      * @return array (contenthash, filesize, newfile)
      *
-     * @throws file_exception
-     * @throws dml_exception
      * @throws Exception
      */
     public function add_file_from_path($pathname, $contenthash = null) {
@@ -337,11 +339,10 @@ class storage_file_system extends file_system {
      * @param string $contenthash
      *
      * @return string The full path to the content file
-     *
-     * @throws dml_exception
      */
     public function get_remote_path_from_hash($contenthash) {
-        // Implemented in storage_file_system.php.
+        // Implemented in storages/s3/s3_file_system.php.
+        return "";
     }
 
     /**
@@ -351,11 +352,10 @@ class storage_file_system extends file_system {
      * @param string $target real path to the new file
      *
      * @return bool success
-     *
-     * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
-        // Implemented in storage_file_system.php.
+        // Implemented in storages/s3/s3_file_system.php.
+        return true;
     }
 
     /**
@@ -364,10 +364,9 @@ class storage_file_system extends file_system {
      * @param string $contenthash
      *
      * @return bool
-     *
-     * @throws Exception
      */
     public function remove_file($contenthash) {
-        // Implemented in storage_file_system.php.
+        // Implemented in storages/s3/s3_file_system.php.
+        return true;
     }
 }
