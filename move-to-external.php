@@ -49,9 +49,17 @@ $externalfilesystem = new external_file_system();
 if (optional_param("execute", false, PARAM_INT)) {
     session_write_close();
     set_time_limit(0);
-    ob_end_flush();
 
-    $sql = "SELECT id, contenthash, mimetype, filename
+    // Do not forcibly end the zlib buffer.
+    if (ob_get_level() > 0) {
+        @ob_flush();
+    }
+    @flush();
+
+    $sql = "SELECT MIN(id) AS id,
+                   contenthash,
+                   MAX(mimetype) AS mimetype,
+                   MAX(filename) AS filename
               FROM {files}
              WHERE contenthash NOT IN (
                     SELECT contenthash
@@ -59,20 +67,41 @@ if (optional_param("execute", false, PARAM_INT)) {
                      WHERE storage = :storage
                  )
                AND filename <> '.'
-               AND mimetype IS NOT NULL";
+               AND mimetype IS NOT NULL
+          GROUP BY contenthash";
+
     $files = $DB->get_recordset_sql($sql, ["storage" => $config->storage_destination]);
-    /** @var object $file */
+
     foreach ($files as $file) {
         $remotefilename = $externalfilesystem->get_local_path_from_hash($file->contenthash);
 
         echo "{$file->id} => {$file->filename} => {$remotefilename}<br>";
+
+        if (function_exists("ob_flush")) {
+            @ob_flush();
+        }
+        @flush();
+
         $a1 = substr($file->contenthash, 0, 2);
         $a2 = substr($file->contenthash, 2, 2);
         $sourcefile = "{$CFG->dataroot}/filedir/{$a1}/{$a2}/{$file->contenthash}";
+
         try {
-            $externalfilesystem->upload($sourcefile, $remotefilename, $file->mimetype, "inline; filename={$file->filename}");
+            $externalfilesystem->upload(
+                $sourcefile,
+                $remotefilename,
+                $file->mimetype,
+                "inline; filename={$file->filename}"
+            );
         } catch (Exception $e) {
-            echo $PAGE->get_renderer("core")->render(new notification($e->getMessage(), notification::NOTIFY_ERROR));
+            echo $PAGE->get_renderer("core")->render(
+                new notification($e->getMessage(), notification::NOTIFY_ERROR)
+            );
+
+            if (function_exists("ob_flush")) {
+                @ob_flush();
+            }
+            @flush();
         }
     }
     $files->close();
