@@ -30,13 +30,10 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
 
-/**
- * Minimum file size, in bytes, that triggers a local download before returning
- * a file handle. Files below this size continue to use the default behaviour.
- */
 if (!defined("LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE")) {
     /**
-     *
+     * Minimum file size, in bytes, that triggers a local download before returning
+     * a file handle. Files below this size continue to use the default behaviour.
      */
     define("LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE", 1048576);
 }
