@@ -204,6 +204,16 @@ class s3_file_system extends storage_file_system implements i_file_system {
             return false;
         }
 
+        if (!file_exists($target) || filesize($target) === 0) {
+            // Direct S3 download produced an empty file; fall back to pre-signed URL.
+            $url = S3::getAuthenticatedURL($this->config->settings_s3_bucketname, $uri, 300, false, true);
+            $data = @file_get_contents($url);
+            if ($data === false || strlen($data) === 0) {
+                return false;
+            }
+            file_put_contents($target, $data);
+        }
+
         $this->report_save($file->get_contenthash());
         return true;
     }
