@@ -82,6 +82,19 @@ if (in_array($config->storage_destination, [ "s3generic"])) {
         PARAM_RAW_TRIMMED
     );
     $settings->add($setting);
+
+    $setting = new admin_setting_configselect(
+        "local_alternative_file_system/settings_s3generic_url_style",
+        get_string("settings_s3generic_url_style", "local_alternative_file_system"),
+        get_string("settings_s3generic_url_style_desc", "local_alternative_file_system"),
+        "auto",
+        [
+            "auto" => get_string("settings_s3generic_url_style_auto", "local_alternative_file_system"),
+            "virtual-hosted" => get_string("settings_s3generic_url_style_virtual", "local_alternative_file_system"),
+            "path-style" => get_string("settings_s3generic_url_style_path", "local_alternative_file_system"),
+        ]
+    );
+    $settings->add($setting);
 }
 
 $setting = new admin_setting_configtext(
