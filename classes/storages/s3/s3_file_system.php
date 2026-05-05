@@ -127,6 +127,12 @@ class s3_file_system extends storage_file_system implements i_file_system {
             $endpoint,
             $this->config->settings_s3_region
         );
+
+        // Set URL style based on setting
+        $urlStyle = get_config("local_alternative_file_system", "settings_s3generic_url_style");
+        if ($urlStyle && in_array($urlStyle, ['auto', 'virtual-hosted', 'path-style'])) {
+            S3::$urlStyle = $urlStyle;
+        }
     }
 
     /**

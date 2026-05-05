@@ -54,6 +54,11 @@ $string['settings_s3generic_destino'] = 'Generic S3 (custom endpoint)';
 $string['settings_s3generic_endpoint'] = 'S3 endpoint URL';
 $string['settings_s3generic_endpoint_desc'] = 'The endpoint is the base address of your S3 service (an S3-compatible provider). You can enter it without <code>https://</code> and with or without the port. Do not include bucket names, nor only the service host (and port, if needed).<blockquote>Examples: <code>https://s3.eu-central-1.amazonaws.com</code>, <code>o000.idrivee.com</code> or <code>minio:9000</code>.<br>Do NOT use: <code><strong style="color:#673AB7;text-decoration:underline;">mybucket.</strong>s3.amazonaws.com</code> or <code>server:9000<strong style="color:#673AB7;text-decoration:underline;">/mybucket</strong></code>.</blockquote>';
 
+$string['settings_s3generic_url_style'] = 'S3 URL Style';
+$string['settings_s3generic_url_style_desc'] = 'Choose how the bucket name is included in the URL. "Virtual-hosted" puts the bucket in the domain (https://bucket.endpoint/uri). "Path-style" puts the bucket in the path (https://endpoint/bucket/uri). "Auto-detect" uses the bucket name format to decide.';
+$string['settings_s3generic_url_style_auto'] = 'Auto-detect (based on bucket name)';
+$string['settings_s3generic_url_style_virtual'] = 'Virtual-hosted (bucket in domain)';
+$string['settings_s3generic_url_style_path'] = 'Path-style (bucket in path)';
 
 $string['settings_success'] = '<strong>Data is correct.</strong><br>Please be cautious when modifying settings, as any incorrect changes can result in inaccessibility of stored files.';
 $string['storage_destination'] = 'Storage Destination';

@@ -10,7 +10,7 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="storage" TYPE="char" LENGTH="5" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="storage" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="timemodifield" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>

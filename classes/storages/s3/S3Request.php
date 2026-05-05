@@ -143,7 +143,18 @@ final class S3Request {
         //	$this->resource = $this->uri;
 
         if ($this->bucket !== '') {
-            if ($this->__dnsBucketName($this->bucket)) {
+            $useVirtualHosted = false;
+
+            if (S3::$urlStyle === 'virtual-hosted') {
+                $useVirtualHosted = true;
+            } elseif (S3::$urlStyle === 'path-style') {
+                $useVirtualHosted = false;
+            } else {
+                // Auto-detect based on bucket name DNS compliance
+                $useVirtualHosted = $this->__dnsBucketName($this->bucket);
+            }
+
+            if ($useVirtualHosted) {
                 $this->headers['Host'] = $this->bucket . '.' . $this->endpoint;
                 $this->resource = '/' . $this->bucket . $this->uri;
             } else {
