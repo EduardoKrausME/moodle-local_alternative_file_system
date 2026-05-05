@@ -23,6 +23,7 @@
  */
 function xmldb_local_alternative_file_system_install() {
     set_config("storage_destination", "", "local_alternative_file_system");
+    set_config("settings_s3generic_url_style", "auto", "local_alternative_file_system");
 
     return true;
 }
