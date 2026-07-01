@@ -23,15 +23,16 @@
  */
 
 use core\output\notification;
+use local_alternative_file_system\filesystem_config;
 use local_alternative_file_system\storages\s3\s3_file_system;
 
 defined('MOODLE_INTERNAL') || die;
 
-if ($config->storage_destination == "s3") {
+if (filesystem_config::get_value("storage_destination") == "s3") {
     $datalang["ex_region"] = "us-east-1";
-} else if ($config->storage_destination == "space") {
+} else if (filesystem_config::get_value("storage_destination") == "space") {
     $datalang["ex_region"] = "nyc1";
-} else if ($config->storage_destination == "s3generic") {
+} else if (filesystem_config::get_value("storage_destination") == "s3generic") {
     $datalang["ex_region"] = "us-east-1";
 }
 
@@ -73,7 +74,7 @@ try {
     }
 }
 
-if (in_array($config->storage_destination, [ "s3generic"])) {
+if (in_array(filesystem_config::get_value("storage_destination"), ["s3generic"])) {
     $setting = new admin_setting_configtext(
         "local_alternative_file_system/settings_s3generic_endpoint",
         get_string("settings_s3generic_endpoint", "local_alternative_file_system"),

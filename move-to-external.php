@@ -23,6 +23,7 @@
 
 use core\output\notification;
 use local_alternative_file_system\external_file_system;
+use local_alternative_file_system\filesystem_config;
 
 define('OPEN_INTERNAL', true);
 
@@ -43,7 +44,6 @@ $PAGE->set_heading(get_string("migrate_title", "local_alternative_file_system"))
 
 echo $OUTPUT->header();
 
-$config = get_config("local_alternative_file_system");
 $externalfilesystem = new external_file_system();
 
 if (optional_param("execute", false, PARAM_INT)) {
@@ -70,7 +70,7 @@ if (optional_param("execute", false, PARAM_INT)) {
                AND mimetype IS NOT NULL
           GROUP BY contenthash";
 
-    $files = $DB->get_recordset_sql($sql, ["storage" => $config->storage_destination]);
+    $files = $DB->get_recordset_sql($sql, ["storage" => filesystem_config::get_value("storage_destination")]);
 
     foreach ($files as $file) {
         $remotefilename = $externalfilesystem->get_local_path_from_hash($file->contenthash);

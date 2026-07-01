@@ -21,6 +21,7 @@ use dml_exception;
 use Exception;
 use file_exception;
 use file_system;
+use local_alternative_file_system\filesystem_config;
 use stored_file;
 
 defined('MOODLE_INTERNAL') || die;
@@ -49,9 +50,8 @@ class storage_file_system extends file_system {
     public function get_local_path_from_hash($contenthash, $fetchifnotfound = false) {
         $paths = [];
 
-        $config = get_config("local_alternative_file_system");
-        if (isset($config->settings_path[2])) {
-            $paths[] = $config->settings_path;
+        if (isset(filesystem_config::get_value("settings_path")[2])) {
+            $paths[] = filesystem_config::get_value("settings_path");
         }
 
         $paths[] = substr($contenthash, 0, 2);
@@ -87,7 +87,6 @@ class storage_file_system extends file_system {
         unlink($pathname);
         return $upload;
     }
-
 
     /**
      * readfile function.
@@ -180,14 +179,14 @@ class storage_file_system extends file_system {
 
         if ($data) {
             if (preg_match("/^HTTP\/1\.[01] (\d\d\d)/", $data, $matches)) {
-                $status = (int)$matches[1];
+                $status = (int) $matches[1];
                 if ($status != 200 || ($status > 300 && $status <= 308)) {
                     return 0;
                 }
             }
 
             if (preg_match("/Content-Length: (\d+)/", $data, $matches)) {
-                return (int)$matches[1];
+                return (int) $matches[1];
             }
         }
 
@@ -204,18 +203,17 @@ class storage_file_system extends file_system {
     public function report_save($contenthash) {
         global $DB;
 
-        $config = get_config("local_alternative_file_system");
-
         $data = [
             "contenthash" => $contenthash,
-            "storage" => $config->storage_destination,
+            "storage" => filesystem_config::get_value("storage_destination"),
             "timemodifield" => time(),
         ];
         try {
             $DB->insert_record("local_alternativefilesystemf", $data);
 
             $cache = cache::make("local_alternative_file_system", "missing_count");
-            $cache->delete("destino_{$config->storage_destination}");
+            $storagedestination = filesystem_config::get_value("storage_destination");
+            $cache->delete("destino_{$storagedestination}");
 
             return true;
         } catch (dml_exception) {
@@ -233,13 +231,12 @@ class storage_file_system extends file_system {
     public function missing_count() {
         global $DB;
 
-        $config = get_config("local_alternative_file_system");
         $cache = cache::make("local_alternative_file_system", "missing_count");
-        $cachekey = "destino_{$config->storage_destination}";
+        $cachekey = "destino_" . filesystem_config::get_value("storage_destination");
 
         $cached = $cache->get($cachekey);
         if ($cached !== false) {
-            return (int)$cached;
+            return (int) $cached;
         }
 
         $sql = "SELECT COUNT(DISTINCT f.contenthash) AS num_files
@@ -251,7 +248,7 @@ class storage_file_system extends file_system {
                AND f.mimetype IS NOT NULL
                AND af.id IS NULL";
 
-        $result = $DB->get_record_sql($sql, ["storage" => $config->storage_destination]);
+        $result = $DB->get_record_sql($sql, ["storage" => filesystem_config::get_value("storage_destination")]);
         $cache->set($cachekey, $result->num_files);
 
         return $result->num_files;
@@ -267,12 +264,10 @@ class storage_file_system extends file_system {
     public function sending_count() {
         global $DB;
 
-        $config = get_config("local_alternative_file_system");
-
         $sql = "SELECT COUNT(*) AS num_files
                   FROM {local_alternativefilesystemf}
                  WHERE storage = :storage";
-        $result = $DB->get_record_sql($sql, ["storage" => $config->storage_destination]);
+        $result = $DB->get_record_sql($sql, ["storage" => filesystem_config::get_value("storage_destination")]);
         return $result->num_files;
     }
 

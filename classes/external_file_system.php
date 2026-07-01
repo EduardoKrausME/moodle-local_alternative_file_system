@@ -56,11 +56,9 @@ class external_file_system extends file_system implements i_file_system {
      * @throws Exception
      */
     public function __construct() {
-        $config = get_config("local_alternative_file_system");
-
-        if (in_array($config->storage_destination, ["s3", "space", "s3generic"])) {
+        if (in_array(filesystem_config::get_value("storage_destination"), ["s3", "space", "s3generic"])) {
             $this->filesysteminstance = new s3_file_system();
-        } else if ($config->storage_destination == "gcs") {
+        } else if (filesystem_config::get_value("storage_destination") == "gcs") {
             $this->filesysteminstance = new gcs_file_system();
         } else {
             $this->filesysteminstance = new file_system_filedir();

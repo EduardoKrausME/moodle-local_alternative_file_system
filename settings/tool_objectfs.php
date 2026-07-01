@@ -23,6 +23,7 @@
  */
 
 use core\output\notification;
+use local_alternative_file_system\filesystem_config;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -64,22 +65,22 @@ if (!empty($CFG->alternative_file_system_class) &&
         $a->settings_path_lang = get_string("settings_path", "local_alternative_file_system", $a);
     }
 
-    if (!isset($config->settings_local[3])) {
+    if (!isset(filesystem_config::get_value("settings_local")[3])) {
         set_config("settings_local", $a->settings_local, "local_alternative_file_system");
     }
-    if (!isset($config->settings_s3_region[3])) {
+    if (!isset(filesystem_config::get_value("settings_s3_region")[3])) {
         set_config("settings_s3_region", $a->settings_s3_region, "local_alternative_file_system");
     }
-    if (!isset($config->settings_s3_credentials_key[3])) {
+    if (!isset(filesystem_config::get_value("settings_s3_credentials_key")[3])) {
         set_config("settings_s3_credentials_key", $a->settings_s3_credentials_key, "local_alternative_file_system");
     }
-    if (!isset($config->settings_s3_credentials_secret[3])) {
+    if (!isset(filesystem_config::get_value("settings_s3_credentials_secret")[3])) {
         set_config("settings_s3_credentials_secret", $a->settings_s3_credentials_secret, "local_alternative_file_system");
     }
-    if (!isset($config->settings_bucketname[3])) {
+    if (!isset(filesystem_config::get_value("settings_bucketname")[3])) {
         set_config("settings_bucketname", $a->settings_bucketname, "local_alternative_file_system");
     }
-    if (!isset($config->settings_path[3])) {
+    if (!isset(filesystem_config::get_value("settings_path")[3])) {
         set_config("settings_path", $a->settings_path, "local_alternative_file_system");
     }
 
