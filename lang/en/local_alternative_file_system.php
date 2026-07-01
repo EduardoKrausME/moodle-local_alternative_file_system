@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * phpcs:disable moodle.Files.LangFilesOrdering.IncorrectOrder
- *
  * Lang en file.
  *
  * @package    local_alternative_file_system
@@ -24,50 +22,32 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['bytescalcfailed'] = 'Failed to calculate bytes (fast=0 mode). Reason: {$a}';
+$string['bytesline'] = 'Bytes: <strong>{$a->migrated}</strong> / <strong>{$a->total}</strong> &nbsp;|&nbsp; Rate (10m): <strong>{$a->rate}/min</strong> &nbsp;|&nbsp; ETA (bytes): <strong>{$a->eta}</strong>';
 $string['cachedef_missing_count'] = 'Cache Missing count';
-$string['instruction_install'] = '<p><strong>Add the line below to the Moodle <code>config.php</code> file:</strong></p><pre><code>$CFG->alternative_file_system_class = \'\local_alternative_file_system\external_file_system\';</code></pre><p><strong>Important:</strong> insert this line <strong>before</strong> the line below (if it exists in your file):</p><pre><code>require_once(__DIR__ . \'/lib/setup.php\');</code></pre>';
+$string['eta'] = 'ETA: <strong>{$a}</strong>';
+$string['instruction_install'] = '<p><strong>Add the line below to the Moodle <code>config.php</code> file:</strong></p><pre><code>$CFG->alternative_file_system_class = \'\\local_alternative_file_system\\external_file_system\';</code></pre><p><strong>Important:</strong> insert this line <strong>before</strong> the line below (if it exists in your file):</p><pre><code>require_once(__DIR__ . \'/lib/setup.php\');</code></pre>';
 $string['instruction_title'] = 'Installation Instructions';
+$string['lasttransfer'] = 'Last transfer: <strong>{$a}</strong>';
 $string['migrate_link'] = '<p><a class="btn btn-success" href="?execute=1">Execute Now (may take a long time)</a></p>';
 $string['migrate_title'] = 'Migrate local storage to remote storage';
 $string['migrate_title_tolocal'] = 'Migrate remote storage to local storage';
 $string['migrate_total'] = '<p>You have <strong>{$a->missing}</strong> local files awaiting migration, while <strong>{$a->sending}</strong> files have already been migrated to the remote environment.</p>';
 $string['migrate_total_local'] = 'Moves files from remote storage back to local storage. This may take some time depending on the amount of data.';
+$string['migratedfiles'] = 'Migrated: <strong>{$a}</strong>';
+$string['nostoragefound'] = 'No storage found to report. Check if the table local_alternativefilesystemf has records.';
 $string['pluginname'] = 'Alternative File System';
 $string['privacy:no_data_reason'] = 'The Alternative File System plugin does not store any personal data.';
+$string['rate'] = 'Rate: <strong>{$a->r1}</strong> file/min (1m) &nbsp;|&nbsp; <strong>{$a->r10}</strong> file/min (10m) &nbsp;|&nbsp; <strong>{$a->r60}</strong> file/min (60m)';
+$string['remainingfiles'] = 'Remaining: <strong>{$a}</strong>';
+$string['reporttitle_status'] = 'Status';
 $string['settings_bucketname'] = '{$a->local} Bucket Name';
 $string['settings_bucketnamedesc'] = 'The unique name assigned to the bucket in {$a->local}.';
 $string['settings_gcs_keyfile'] = 'Google-storage.json Content';
 $string['settings_gcs_keyfiledesc'] = 'Paste here the content of the "google-storage.json" file.';
 $string['settings_local'] = 'Local files in Moodle';
-$string['settings_migrate_local']  = 'Use the <a target="_blank" href="{$a->url}/move-to-local.php">move-to-local.php</a> service to migrate data from {$a->local} to local storage.';
+$string['settings_migrate_local'] = 'Use the <a target="_blank" href="{$a->url}/move-to-local.php">move-to-local.php</a> service to migrate data from {$a->local} to local storage.';
 $string['settings_migrate_remote'] = 'Use the <a target="_blank" href="{$a->url}/move-to-external.php">move-to-external.php</a> service to migrate data from local storage to {$a->local}.';
-$string['settings_path'] = '{$a->local} Object Path';
-$string['settings_pathdesc'] = 'The path within the bucket where objects will be stored. Only letters and numbers are accepted.';
-$string['settings_s3_credentials_key'] = '{$a->local} Access Key';
-$string['settings_s3_credentials_keydesc'] = 'The access key used to authenticate with the {$a->local} service.';
-$string['settings_s3_credentials_secret'] = '{$a->local} Secret Key';
-$string['settings_s3_credentials_secretdesc'] = 'The secret key used to authenticate with the {$a->local} service.';
-$string['settings_s3_region'] = '{$a->local} Region';
-$string['settings_s3_regiondesc'] = 'The region where the {$a->local} bucket is located, for example, "{$a->ex_region}".';
-
-$string['settings_s3generic_destino'] = 'Generic S3 (custom endpoint)';
-$string['settings_s3generic_endpoint'] = 'S3 endpoint URL';
-$string['settings_s3generic_endpoint_desc'] = 'The endpoint is the base address of your S3 service (an S3-compatible provider). You can enter it without <code>https://</code> and with or without the port. Do not include bucket names, nor only the service host (and port, if needed).<blockquote>Examples: <code>https://s3.eu-central-1.amazonaws.com</code>, <code>o000.idrivee.com</code> or <code>minio:9000</code>.<br>Do NOT use: <code><strong style="color:#673AB7;text-decoration:underline;">mybucket.</strong>s3.amazonaws.com</code> or <code>server:9000<strong style="color:#673AB7;text-decoration:underline;">/mybucket</strong></code>.</blockquote>';
-
-
-$string['settings_success'] = '<strong>Data is correct.</strong><br>Please be cautious when modifying settings, as any incorrect changes can result in inaccessibility of stored files.';
-$string['storage_destination'] = 'Storage Destination';
-$string['storage_destinationdesc'] = 'Choose the storage destination and save to load storage-related data.';
-$string['reporttitle_status'] = 'Status';
-$string['nostoragefound'] = 'No storage found to report. Check if the table local_alternativefilesystemf has records.';
-$string['totalfiles'] = 'Total files in MDL_FILES: <strong>{$a}</strong>';
-$string['migratedfiles'] = 'Migrated: <strong>{$a}</strong>';
-$string['remainingfiles'] = 'Remaining: <strong>{$a}</strong>';
-$string['lasttransfer'] = 'Last transfer: <strong>{$a}</strong>';
-$string['rate'] = 'Rate: <strong>{$a->r1}</strong> file/min (1m) &nbsp;|&nbsp; <strong>{$a->r10}</strong> file/min (10m) &nbsp;|&nbsp; <strong>{$a->r60}</strong> file/min (60m)';
-$string['eta'] = 'ETA: <strong>{$a}</strong>';
-$string['bytesline'] = 'Bytes: <strong>{$a->migrated}</strong> / <strong>{$a->total}</strong> &nbsp;|&nbsp; Rate (10m): <strong>{$a->rate}/min</strong> &nbsp;|&nbsp; ETA (bytes): <strong>{$a->eta}</strong>';
-$string['bytescalcfailed'] = 'Failed to calculate bytes (fast=0 mode). Reason: {$a}';
 $string['settings_objectfs_notice'] = '
 <p>Currently, <code>$CFG->alternative_file_system_class</code> is set to <code>\'{$a->currentclass}\';</code> and this means that this site is currently using <strong>tool_objectfs</strong> as Moodle’s alternative file system.</p>
 
@@ -81,4 +61,19 @@ $string['settings_objectfs_notice'] = '
   <li><strong>{$a->settings_path_lang}</strong>: <code>{$a->settings_path}</code></li>
 </ul>
 
-<p>Then, first you need to change the value in <code>config.php</code> to <code>$CFG->alternative_file_system_class = \'\local_alternative_file_system\external_file_system\';</code> in order to use this plugin as the alternative file system.</p>';
+<p>Then, first you need to change the value in <code>config.php</code> to <code>$CFG->alternative_file_system_class = \'\\local_alternative_file_system\\external_file_system\';</code> in order to use this plugin as the alternative file system.</p>';
+$string['settings_path'] = '{$a->local} Object Path';
+$string['settings_pathdesc'] = 'The path within the bucket where objects will be stored. Only letters and numbers are accepted.';
+$string['settings_s3_credentials_key'] = '{$a->local} Access Key';
+$string['settings_s3_credentials_keydesc'] = 'The access key used to authenticate with the {$a->local} service.';
+$string['settings_s3_credentials_secret'] = '{$a->local} Secret Key';
+$string['settings_s3_credentials_secretdesc'] = 'The secret key used to authenticate with the {$a->local} service.';
+$string['settings_s3_region'] = '{$a->local} Region';
+$string['settings_s3_regiondesc'] = 'The region where the {$a->local} bucket is located, for example, "{$a->ex_region}".';
+$string['settings_s3generic_destino'] = 'Generic S3 (custom endpoint)';
+$string['settings_s3generic_endpoint'] = 'S3 endpoint URL';
+$string['settings_s3generic_endpoint_desc'] = 'The endpoint is the base address of your S3 service (an S3-compatible provider). You can enter it without <code>https://</code> and with or without the port. Do not include bucket names, nor only the service host (and port, if needed).<blockquote>Examples: <code>https://s3.eu-central-1.amazonaws.com</code>, <code>o000.idrivee.com</code> or <code>minio:9000</code>.<br>Do NOT use: <code><strong style="color:#673AB7;text-decoration:underline;">mybucket.</strong>s3.amazonaws.com</code> or <code>server:9000<strong style="color:#673AB7;text-decoration:underline;">/mybucket</strong></code>.</blockquote>';
+$string['settings_success'] = '<strong>Data is correct.</strong><br>Please be cautious when modifying settings, as any incorrect changes can result in inaccessibility of stored files.';
+$string['storage_destination'] = 'Storage Destination';
+$string['storage_destinationdesc'] = 'Choose the storage destination and save to load storage-related data.';
+$string['totalfiles'] = 'Total files in MDL_FILES: <strong>{$a}</strong>';
