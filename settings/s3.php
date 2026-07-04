@@ -28,11 +28,9 @@ use local_alternative_file_system\storages\s3\s3_file_system;
 
 defined('MOODLE_INTERNAL') || die;
 
-if (filesystem_config::get_value("storage_destination") == "s3") {
-    $datalang["ex_region"] = "us-east-1";
-} else if (filesystem_config::get_value("storage_destination") == "space") {
+if (filesystem_config::get_value("storage_destination") == "space") {
     $datalang["ex_region"] = "nyc1";
-} else if (filesystem_config::get_value("storage_destination") == "s3generic") {
+} else {
     $datalang["ex_region"] = "us-east-1";
 }
 
