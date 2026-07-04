@@ -40,7 +40,7 @@ class filesystem_config {
         static $config = get_config("local_alternative_file_system");
 
         $value = $config->$configname;
-        if($configname == "settings_path"){
+        if ($configname == "settings_path") {
             $value = str_replace(['https://', 'http://'], '', $value);
         }
 
