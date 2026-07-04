@@ -37,7 +37,10 @@ class filesystem_config {
      * @throws \dml_exception
      */
     public static function get_value($configname) {
-        static $config = get_config("local_alternative_file_system");
+        static $config = null;
+        if (!$config) {
+            $config = get_config("local_alternative_file_system");
+        }
 
         $value = $config->$configname;
         if ($configname == "settings_path") {
