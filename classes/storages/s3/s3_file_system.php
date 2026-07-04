@@ -96,9 +96,9 @@ class s3_file_system extends storage_file_system implements i_file_system {
 
         $endpoint = "";
         if (filesystem_config::get_value("storage_destination") == "s3") {
-            $endpoint = "s3.".filesystem_config::get_value("settings_s3_region").".amazonaws.com";
+            $endpoint = "s3." . filesystem_config::get_value("settings_s3_region") . ".amazonaws.com";
         } else if (filesystem_config::get_value("storage_destination") == "space") {
-            $endpoint = filesystem_config::get_value("settings_s3_region").".digitaloceanspaces.com";
+            $endpoint = filesystem_config::get_value("settings_s3_region") . ".digitaloceanspaces.com";
         } else if (filesystem_config::get_value("storage_destination") == "s3generic") {
             $endpoint = filesystem_config::get_value("settings_s3generic_endpoint");
             if (preg_match('#^https?://#i', $endpoint)) {
