@@ -1,0 +1,24 @@
+# (RFC §4.1). Authors update their listing with an ordinary commit; camp
+# ingests and hash-pins it at each tagged release. Listing for local_alternative_file_system.
+
+name: "Alternative File System"
+summary: "Store files on external services and optimize the platform infrastructure."
+description: |
+  Store files on external services and optimize the platform infrastructure.
+
+  Move moodledata/filedir to the cloud and have Moodle serve/read files directly from remote storage-reducing pressure on local disks and making scalability easier.
+
+  Key capabilities:
+  - AWS S3 Supported
+  - DigitalOcean Spaces Supported
+  - S3-compatible Depends on the endpoint
+
+  Supported Moodle versions in the supplied plugin list: 3.9 - 5.0.
+
+labels:
+  - external-account
+  - paid-service
+category: "administration"
+links:
+  docs: https://github.com/EduardoKrausME/moodle-local_alternative_file_system#readme
+  issues: https://github.com/EduardoKrausME/moodle-local_alternative_file_system/issues
