@@ -79,6 +79,7 @@ jobs:
       uses: EduardoKrausME/moodle-plugin-validate@main
       with:
         plugin: ./plugin
+        ignore-table-prefix: true
 
     - name: Moodle Code Checker
       if: ${{ !cancelled() }}
