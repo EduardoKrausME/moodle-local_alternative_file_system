@@ -102,5 +102,20 @@ function xmldb_local_alternative_file_system_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026021000, 'local', 'alternative_file_system');
     }
 
+    if ($oldversion < 2026050500) {
+        // Set default value for the new S3 URL style setting
+        $current = get_config("local_alternative_file_system", "settings_s3generic_url_style");
+        if ($current === false) {
+            set_config("settings_s3generic_url_style", "auto", "local_alternative_file_system");
+        }
+
+        $table = new xmldb_table('local_alternativefilesystemf');
+        $field = new xmldb_field('storage', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, null, 'contenthash');
+
+        $dbman->change_field_precision($table, $field);
+
+        upgrade_plugin_savepoint(true, 2026050500, 'local', 'alternative_file_system');
+    }
+
     return true;
 }

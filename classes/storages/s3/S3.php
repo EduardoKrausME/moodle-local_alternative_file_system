@@ -95,6 +95,16 @@ class S3 {
     public static $proxy = null;
 
     /**
+     * URL style for S3 requests
+     * Possible values: 'auto', 'virtual-hosted', 'path-style'
+     *
+     * @var string
+     * @access public
+     * @static
+     */
+    public static $urlStyle = 'auto';
+
+    /**
      * Use SSL validation?
      *
      * @var bool
@@ -1089,8 +1099,21 @@ class S3 {
 
         $uri = str_replace(array('%2F', '%2B'), array('/', '+'), rawurlencode($uri));
 
-        if ($hostBucket) {
-            $hostname = $bucket;
+        // Determine URL style based on S3::$urlStyle
+        $useVirtualHosted = false;
+        if (S3::$urlStyle === 'virtual-hosted') {
+            $useVirtualHosted = true;
+        } elseif (S3::$urlStyle === 'path-style') {
+            $useVirtualHosted = false;
+        } else {
+            // Auto-detect: use virtual-hosted if bucket name is DNS-compliant
+            $useVirtualHosted = preg_match('/^[a-z0-9][a-z0-9.-]*[a-z0-9]$/i', $bucket)
+                && !preg_match('/\.\./', $bucket)
+                && strlen($bucket) <= 63;
+        }
+
+        if ($useVirtualHosted) {
+            $hostname = $bucket . '.' . self::$endpoint;
             $canonicalUri = '/' . $uri;
         } else {
             $hostname = self::$endpoint;

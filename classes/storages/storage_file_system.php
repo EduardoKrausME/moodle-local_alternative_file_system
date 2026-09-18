@@ -216,7 +216,7 @@ class storage_file_system extends file_system {
             $cache->delete("destino_{$storagedestination}");
 
             return true;
-        } catch (dml_exception) {
+        } catch (dml_exception $e) {
             return false;
         }
     }
