@@ -44,7 +44,6 @@ $PAGE->set_heading(get_string("migrate_title_tolocal", "local_alternative_file_s
 
 echo $OUTPUT->header();
 
-$config = get_config("local_alternative_file_system");
 $externalfilesystem = new external_file_system();
 
 if (optional_param("execute", false, PARAM_INT)) {

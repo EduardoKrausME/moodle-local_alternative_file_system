@@ -16,9 +16,9 @@
 
 namespace local_alternative_file_system\storages\gcs;
 
-use dml_exception;
 use Exception;
 use Google\Cloud\Storage\StorageClient;
+use local_alternative_file_system\filesystem_config;
 use local_alternative_file_system\i_file_system;
 use local_alternative_file_system\storages\s3\S3;
 use local_alternative_file_system\storages\storage_file_system;
@@ -48,10 +48,8 @@ class gcs_file_system extends storage_file_system implements i_file_system {
             return $storage;
         }
 
-        $config = get_config("local_alternative_file_system");
-
         $storage = new StorageClient([
-            "keyFile" => json_decode($config->settings_gcs_keyfile, true),
+            "keyFile" => json_decode(filesystem_config::get_value("settings_gcs_keyfile"), true),
         ]);
 
         return $storage;
@@ -65,17 +63,15 @@ class gcs_file_system extends storage_file_system implements i_file_system {
     public function test_config() {
         global $CFG;
 
-        $config = get_config("local_alternative_file_system");
-
-        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', "", $config->settings_path);
-        if ($settingspath != $config->settings_path) {
+        $settingspath = preg_replace('/[^a-zA-Z0-9\.\-]/', "", filesystem_config::get_value("settings_path"));
+        if ($settingspath != filesystem_config::get_value("settings_path")) {
             set_config("settings_path", $settingspath, "local_alternative_file_system");
         }
 
         $pathname = "{$CFG->tempdir}/teste.txt";
         file_put_contents($pathname, "123");
 
-        $bucket = S3::bucket($config->settings_gcs_bucketname);
+        $bucket = S3::bucket(filesystem_config::get_value("settings_gcs_bucketname"));
         $filename = $this->get_local_path_from_hash(md5("1"));
         $stream = fopen($pathname, "r");
         $options = ["name" => $filename];
@@ -99,9 +95,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      */
     public function get_remote_path_from_hash($contenthash, $fetchifnotfound = false) {
 
-        $config = get_config("local_alternative_file_system");
-
-        $bucket = S3::bucket($config->settings_gcs_bucketname);
+        $bucket = S3::bucket(filesystem_config::get_value("settings_gcs_bucketname"));
         $object = $bucket->object($this->get_local_path_from_hash($contenthash));
 
         return $object->signedUrl(time() + 1500);
@@ -116,9 +110,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function copy_content_from_storedfile(stored_file $file, $target) {
-        $config = get_config('local_alternative_file_system');
-
-        $bucket = S3::bucket($config->settings_gcs_bucketname);
+        $bucket = S3::bucket(filesystem_config::get_value("settings_gcs_bucketname"));
         $object = $bucket->object($this->get_local_path_from_hash($file->get_contenthash()));
 
         $object->downloadToFile($target);
@@ -148,9 +140,7 @@ class gcs_file_system extends storage_file_system implements i_file_system {
      * @throws Exception
      */
     public function upload($sourcefile, $filename, $contenttype, $contentdisposition) {
-        $config = get_config("local_alternative_file_system");
-
-        $bucket = S3::bucket($config->settings_gcs_bucketname);
+        $bucket = S3::bucket(filesystem_config::get_value("settings_gcs_bucketname"));
         $stream = fopen($sourcefile, "r");
         $options = [
             "name" => $filename,

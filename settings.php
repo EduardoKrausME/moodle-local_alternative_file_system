@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_alternative_file_system\filesystem_config;
+
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) {
@@ -34,7 +36,6 @@ if ($hassiteconfig) {
     $section = optional_param("section", "", PARAM_ALPHANUMEXT);
     $isthispluginsettings = ($section == "local_alternative_file_system");
 
-    $config = get_config("local_alternative_file_system");
     $settings = new admin_settingpage("local_alternative_file_system", get_string("pluginname", "local_alternative_file_system"));
 
     $ADMIN->add("localplugins", $settings);
@@ -50,7 +51,7 @@ if ($hassiteconfig) {
             "space" => "Digital Ocean Space",
             "s3generic" => get_string("settings_s3generic_destino", "local_alternative_file_system"),
         ];
-        if ($config->storage_destination == "gcs") {
+        if (filesystem_config::get_value("storage_destination") == "gcs") {
             $settingsdestinos[] = ["gcs" => "Google Cloud Storage"];
         }
 
@@ -67,14 +68,14 @@ if ($hassiteconfig) {
 
         $datalang = [
             "url" => "{$CFG->wwwroot}/local/alternative_file_system",
-            "local" => $settingsdestinos[$config->storage_destination],
+            "local" => $settingsdestinos[filesystem_config::get_value("storage_destination")],
         ];
 
         if ($isthispluginsettings) {
-            if (in_array($config->storage_destination, ["s3", "space", "s3generic"])) {
+            if (in_array(filesystem_config::get_value("storage_destination"), ["s3", "space", "s3generic"])) {
                 require_once(__DIR__ . "/settings/s3.php");
             }
-            if ($config->storage_destination == "gcs") {
+            if (filesystem_config::get_value("storage_destination") == "gcs") {
                 require_once(__DIR__ . "/settings/gcs.php");
             }
         }

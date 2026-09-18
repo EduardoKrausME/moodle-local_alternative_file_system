@@ -28,15 +28,8 @@ use stored_file;
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
+require_once("{$CFG->dirroot}/lib/filestorage/file_system.php");
 require_once("{$CFG->dirroot}/lib/filestorage/file_system_filedir.php");
-
-if (!defined("LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE")) {
-    /**
-     * Minimum file size, in bytes, that triggers a local download before returning
-     * a file handle. Files below this size continue to use the default behaviour.
-     */
-    define("LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE", 1048576);
-}
 
 /**
  * external_file_system file.
@@ -56,11 +49,9 @@ class external_file_system extends file_system implements i_file_system {
      * @throws Exception
      */
     public function __construct() {
-        $config = get_config("local_alternative_file_system");
-
-        if (in_array($config->storage_destination, ["s3", "space", "s3generic"])) {
+        if (in_array(filesystem_config::get_value("storage_destination"), ["s3", "space", "s3generic"])) {
             $this->filesysteminstance = new s3_file_system();
-        } else if ($config->storage_destination == "gcs") {
+        } else if (filesystem_config::get_value("storage_destination") == "gcs") {
             $this->filesysteminstance = new gcs_file_system();
         } else {
             $this->filesysteminstance = new file_system_filedir();
@@ -234,7 +225,7 @@ class external_file_system extends file_system implements i_file_system {
      * @throws coding_exception
      */
     public function get_content_file_handle(stored_file $file, $type = stored_file::FILE_HANDLE_FOPEN) {
-        if ($file->get_filesize() >= LOCAL_ALTERNATIVE_FILE_SYSTEM_MIN_DOWNLOAD_SIZE) {
+        if ($file->get_filesize() >= 1048576) {
             $localpath = $this->get_local_file_for_stored_file($file);
             return self::get_file_handle_for_path($localpath, $type);
         }

@@ -15,17 +15,38 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * version file.
+ * Config file.
  *
  * @package    local_alternative_file_system
- * @copyright  2024 Eduardo Kraus {@link https://eduardokraus.com}
+ * @copyright  2026 Eduardo Kraus {@link https://eduardokraus.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+namespace local_alternative_file_system;
 
-$plugin->version = 2026070301;
-$plugin->release = "1.3.6";
-$plugin->component = "local_alternative_file_system";
-$plugin->requires = 2021041900;
-$plugin->maturity = MATURITY_STABLE;
+/**
+ * Class config
+ */
+class filesystem_config {
+
+    /**
+     * Function get_value
+     *
+     * @param $configname
+     * @return string
+     * @throws \dml_exception
+     */
+    public static function get_value($configname) {
+        static $config = null;
+        if (!$config) {
+            $config = get_config("local_alternative_file_system");
+        }
+
+        $value = $config->$configname;
+        if ($configname == "settings_path") {
+            $value = str_replace(['https://', 'http://'], '', $value);
+        }
+
+        return $value;
+    }
+}
