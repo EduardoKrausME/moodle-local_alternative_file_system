@@ -145,9 +145,9 @@ final class S3Request {
         if ($this->bucket !== '') {
             $useVirtualHosted = false;
 
-            if (S3::$urlStyle === 'virtual-hosted') {
+            if (S3::$urlstyle === 'virtual-hosted') {
                 $useVirtualHosted = true;
-            } elseif (S3::$urlStyle === 'path-style') {
+            } elseif (S3::$urlstyle === 'path-style') {
                 $useVirtualHosted = false;
             } else {
                 // Auto-detect based on bucket name DNS compliance

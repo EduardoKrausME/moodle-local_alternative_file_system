@@ -102,7 +102,7 @@ class S3 {
      * @access public
      * @static
      */
-    public static $urlStyle = 'auto';
+    public static $urlstyle = 'auto';
 
     /**
      * Use SSL validation?
@@ -1099,11 +1099,11 @@ class S3 {
 
         $uri = str_replace(array('%2F', '%2B'), array('/', '+'), rawurlencode($uri));
 
-        // Determine URL style based on S3::$urlStyle
+        // Determine URL style based on S3::$urlstyle
         $useVirtualHosted = false;
-        if (S3::$urlStyle === 'virtual-hosted') {
+        if (S3::$urlstyle === 'virtual-hosted') {
             $useVirtualHosted = true;
-        } elseif (S3::$urlStyle === 'path-style') {
+        } elseif (S3::$urlstyle === 'path-style') {
             $useVirtualHosted = false;
         } else {
             // Auto-detect: use virtual-hosted if bucket name is DNS-compliant
