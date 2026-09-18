@@ -103,7 +103,7 @@ function xmldb_local_alternative_file_system_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026050500) {
-        // Set default value for the new S3 URL style setting
+        // Set default value for the new S3 URL style setting.
         $current = get_config("local_alternative_file_system", "settings_s3generic_url_style");
         if ($current === false) {
             set_config("settings_s3generic_url_style", "auto", "local_alternative_file_system");
