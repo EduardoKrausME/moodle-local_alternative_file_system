@@ -79,7 +79,10 @@ jobs:
       uses: EduardoKrausME/moodle-plugin-validate@main
       with:
         plugin: ./plugin
-        ignore-table-prefix: true
+        ignore-table-prefix:
+          description: Skip validation that database table names must use the full plugin component prefix.
+          required: false
+          default: 'false'
 
     - name: Moodle Code Checker
       if: ${{ !cancelled() }}
