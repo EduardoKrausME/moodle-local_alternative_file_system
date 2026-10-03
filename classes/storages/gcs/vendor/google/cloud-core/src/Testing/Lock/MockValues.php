@@ -18,6 +18,8 @@
 
 namespace Google\Cloud\Core\Testing\Lock;
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once __DIR__ . '/MockGlobals.php';
 
 /**
