@@ -21,7 +21,6 @@ use Exception;
 use file_exception;
 use file_system;
 use file_system_filedir;
-use local_alternative_file_system\storages\gcs\gcs_file_system;
 use local_alternative_file_system\storages\s3\s3_file_system;
 use stored_file;
 
@@ -51,8 +50,6 @@ class external_file_system extends file_system implements i_file_system {
     public function __construct() {
         if (in_array(filesystem_config::get_value("storage_destination"), ["s3", "space", "s3generic"])) {
             $this->filesysteminstance = new s3_file_system();
-        } else if (filesystem_config::get_value("storage_destination") == "gcs") {
-            $this->filesysteminstance = new gcs_file_system();
         } else {
             $this->filesysteminstance = new file_system_filedir();
         }

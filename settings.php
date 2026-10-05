@@ -51,9 +51,6 @@ if ($hassiteconfig) {
             "space" => "Digital Ocean Space",
             "s3generic" => get_string("settings_s3generic_destino", "local_alternative_file_system"),
         ];
-        if (filesystem_config::get_value("storage_destination") == "gcs") {
-            $settingsdestinos[] = ["gcs" => "Google Cloud Storage"];
-        }
 
         $settings->add(
             new admin_setting_configselect(
@@ -74,9 +71,6 @@ if ($hassiteconfig) {
         if ($isthispluginsettings) {
             if (in_array(filesystem_config::get_value("storage_destination"), ["s3", "space", "s3generic"])) {
                 require_once(__DIR__ . "/settings/s3.php");
-            }
-            if (filesystem_config::get_value("storage_destination") == "gcs") {
-                require_once(__DIR__ . "/settings/gcs.php");
             }
         }
 

@@ -45,8 +45,6 @@ $string['remainingfiles'] = 'Remaining: <strong>{$a}</strong>';
 $string['reporttitle_status'] = 'Status';
 $string['settings_bucketname'] = '{$a->local} Bucket Name';
 $string['settings_bucketnamedesc'] = 'The unique name assigned to the bucket in {$a->local}.';
-$string['settings_gcs_keyfile'] = 'Google-storage.json Content';
-$string['settings_gcs_keyfiledesc'] = 'Paste here the content of the "google-storage.json" file.';
 $string['settings_local'] = 'Local files in Moodle';
 $string['settings_migrate_local'] = 'Use the <a target="_blank" href="{$a->url}/move-to-local.php">move-to-local.php</a> service to migrate data from {$a->local} to local storage.';
 $string['settings_migrate_remote'] = 'Use the <a target="_blank" href="{$a->url}/move-to-external.php">move-to-external.php</a> service to migrate data from local storage to {$a->local}.';
