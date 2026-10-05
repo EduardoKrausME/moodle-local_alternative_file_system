@@ -27,7 +27,6 @@ define('min_duration', 5);       // Min duration of test in seconds.
 define('max_duration', 30);      // Max duration of test in seconds.
 define('min_iterations', 10000); // Min number of iterations.
 
-
 /*
 Tested on my mid-2014 MacBook Pro (with SSE4.2)
 
@@ -92,7 +91,6 @@ function test($crc, $chunk_size) {
     if ($crc->hash() == '00000000') {
         exit($name . ' crc check failed');
     }
-
 
     $bytes = $i * $chunk_size;
 

@@ -411,7 +411,6 @@ class JWT {
         return \str_replace('=', '', \strtr(\base64_encode($input), '+/', '-_'));
     }
 
-
     /**
      * Determine if an algorithm has been provided for each Key
      *

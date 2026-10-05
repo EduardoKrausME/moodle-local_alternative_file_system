@@ -135,7 +135,6 @@ class SlackRecord {
                 $attachment['fields'][] = $this->generateAttachmentField('Level', $record['level_name']);
             }
 
-
             if ($this->includeContextAndExtra) {
                 foreach (array('extra', 'context') as $key) {
                     if (empty($record[$key])) {

@@ -26,7 +26,6 @@ class UidProcessor implements ProcessorInterface, ResettableInterface {
             throw new \InvalidArgumentException('The uid length must be an integer between 1 and 32');
         }
 
-
         $this->uid = $this->generateUid($length);
     }
 

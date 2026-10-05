@@ -46,7 +46,6 @@ final class PHP implements CRCInterface {
         $this->reset();
     }
 
-
     public function reset() {
         $this->crc = ~0;
     }

@@ -134,5 +134,4 @@ class RollbarHandler extends AbstractProcessingHandler {
         parent::reset();
     }
 
-
 }

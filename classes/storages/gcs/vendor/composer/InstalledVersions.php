@@ -1,10 +1,8 @@
 <?php
 
-
 namespace Composer;
 
 use Composer\Semver\VersionParser;
-
 
 class InstalledVersions {
     private static $installed = array(
@@ -180,16 +178,13 @@ class InstalledVersions {
             ),
     );
 
-
     public static function getInstalledPackages() {
         return array_keys(self::$installed['versions']);
     }
 
-
     public static function isInstalled($packageName) {
         return isset(self::$installed['versions'][$packageName]);
     }
-
 
     public static function satisfies(VersionParser $parser, $packageName, $constraint) {
         $constraint = $parser->parseConstraints($constraint);
@@ -197,7 +192,6 @@ class InstalledVersions {
 
         return $provided->matches($constraint);
     }
-
 
     public static function getVersionRanges($packageName) {
         if (!isset(self::$installed['versions'][$packageName])) {
@@ -221,7 +215,6 @@ class InstalledVersions {
         return implode(' || ', $ranges);
     }
 
-
     public static function getVersion($packageName) {
         if (!isset(self::$installed['versions'][$packageName])) {
             throw new \OutOfBoundsException('Package "' . $packageName . '" is not installed');
@@ -233,7 +226,6 @@ class InstalledVersions {
 
         return self::$installed['versions'][$packageName]['version'];
     }
-
 
     public static function getPrettyVersion($packageName) {
         if (!isset(self::$installed['versions'][$packageName])) {
@@ -247,7 +239,6 @@ class InstalledVersions {
         return self::$installed['versions'][$packageName]['pretty_version'];
     }
 
-
     public static function getReference($packageName) {
         if (!isset(self::$installed['versions'][$packageName])) {
             throw new \OutOfBoundsException('Package "' . $packageName . '" is not installed');
@@ -260,16 +251,13 @@ class InstalledVersions {
         return self::$installed['versions'][$packageName]['reference'];
     }
 
-
     public static function getRootPackage() {
         return self::$installed['root'];
     }
 
-
     public static function getRawData() {
         return self::$installed;
     }
-
 
     public static function reload($data) {
         self::$installed = $data;
