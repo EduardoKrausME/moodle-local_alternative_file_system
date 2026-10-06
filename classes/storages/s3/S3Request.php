@@ -52,6 +52,11 @@ final class S3Request {
      */
     private $bucket;
 
+    /**
+     * Property uri.
+     *
+     * @var mixed
+     */
     private $uri;
 
     /**
