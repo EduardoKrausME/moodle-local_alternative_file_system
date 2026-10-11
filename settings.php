@@ -73,7 +73,6 @@ if ($hassiteconfig) {
                 require_once(__DIR__ . "/settings/s3.php");
             }
         }
-
     } else {
         $setting = new admin_setting_heading(
             "local_alternative_file_system/header4",
