@@ -126,6 +126,14 @@ final class S3Request {
     public $response;
 
     /**
+     * S3 file
+     *
+     * @var object
+     * @access public
+     */
+    public $file;
+
+    /**
      * Constructor
      *
      * @param string $verb     Verb
