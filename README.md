@@ -55,19 +55,6 @@ By choosing remote storage instead of Moodle’s local storage, you benefit from
 4. **Generate access keys:**
     * Generate access keys/credentials with appropriate read and write permissions for the Space.
 
-## Implementation
-
-```php
-$CFG->alternative_file_system_class = '\local_alternative_file_system\external_file_system';
-```
-
-So it becomes:
-
-```php
-$CFG->alternative_file_system_class = '\local_alternative_file_system\external_file_system';
-
-require_once( __DIR__ . '/lib/setup.php' );
-```
 
 ## Migration in two scenarios
 
@@ -78,10 +65,10 @@ require_once( __DIR__ . '/lib/setup.php' );
 
 ### Scenario B) Migrating from tool_objectfs → local_alternative_file_system
 
-While Moodle is configured as `$CFG->alternative_file_system_class = "\\tool_objectfs\\...";`, open the `alternative_file_system_class` plugin settings and configure the plugin.
+Existing `tool_objectfs` settings can be detected during migration to the alternative file-system integration.
 
 The plugin will automatically detect the `tool_objectfs` configuration, apply those settings to this plugin, and run the tests.
 
-Once everything looks good, switch `$CFG->alternative_file_system_class` as shown in the **Implementation** section above.
+Once migration is completed and the destination is active, Moodle reads and serves files from the configured remote storage.
 
 From then on, Moodle will serve/read files directly through `local_alternative_file_system`.
